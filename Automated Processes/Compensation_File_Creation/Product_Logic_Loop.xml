@@ -1,0 +1,21 @@
+﻿<Task>
+	<!-- Process_Only_Active_Policies -->
+    <ExtractVariablesFromTable Table="Heir_Exists_During_Jeopardy_List" SelectQuery="SIGORTALI_KIMLIK_NO={0}" ParameterVariables="SIGORTALI_KIMLIK_NO" Columns="VEFAT_TARIHI" SingleOutputTextFormat="{0}" OutputVariable="VEFAT_TARIHI"/>
+    <StoreExcelDateToVariables Variable="VEFAT_TARIHI" DayVariable="DEATH_DAY" MonthVariable="DEATH_MONTH" YearVariable="DEATH_YEAR"/>
+    <CompareVariableWithValue Variable="SEVK_CODE" Value="28000">
+      <True>
+         <LookUpTable Table="Group_Types" PrimaryKeyVariables="GROUP_CODE" RetrieveColumns="GROUP_TYPE,CURRENCY_TYPE" StoreAtVariables="GROUP_TYPE,CURRENCY_TYPE"/>
+         <ProcessTaskFile FileName="Create_Compensation_File_Loop.xml"/>
+     </True>
+     <False>
+        <CompareVariableWithValue Variable="SEVK_CODE" Value="52000">
+            <True>
+                <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi tenzil olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+            </True>
+            <False>
+               <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi iptal olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+           </False>
+       </CompareVariableWithValue>
+   </False>
+</CompareVariableWithValue>
+</Task>

@@ -1,0 +1,44 @@
+<Task>
+	<CompareVariableWithValue Variable="FILE_OPENNED_FLAG" Value="X">
+		<True>
+			<ClickBrowser Id="TabHome"/>
+			<ClickBrowser Id="CS"/>
+			<ClickBrowser Id="nav_cases" WaitInvisibleId="nav_cases"/>
+			<ClickBrowser Id="incident|NoRelationship|HomePageGrid|Mscrm.HomepageGrid.incident.NewRecord"/>
+			<SendTextToBrowser Id="header_crmFormSelector" Value="PensionSoft_HSM"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="customerid_ledit" Variable="SIGORTALI_KIMLIK_NO"/>
+			<!--<SendTextToBrowser Frame="contentIFrame1" Id="ps_groupid_ledit" Variable="GROUP_CODE"/>-->
+			<SendTextToBrowser Frame="contentIFrame1" Id="ps_declarationdate_iDateInput" Value="25.9.2017"/>
+			<SetVariable Variable="DEATH_DATE" Value=""/>
+			<SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_DAY"/>
+			<SetVariable Variable="DEATH_DATE" ConcatenateText="."/>
+			<SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_MONTH"/>
+			<SetVariable Variable="DEATH_DATE" ConcatenateText="."/>
+			<SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_YEAR"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="ps_claimdate_iDateInput" Variable="DEATH_DATE"/>
+			<SetVariable Variable="GROUP_POLICY_CODE" Value=""/>
+			<SetVariable Variable="GROUP_POLICY_CODE" ConcatenateVariable="GROUP_CODE"/>
+			<SetVariable Variable="GROUP_POLICY_CODE" ConcatenateText="-"/>
+			<SetVariable Variable="GROUP_POLICY_CODE" ConcatenateVariable="POLICY_CODE"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="ps_policyid_ledit" Variable="GROUP_POLICY_CODE"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="caseorigincode_i" Value="Eposta"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="ps_casecategoryid_ledit" Value="HAYAT - TALEPLER"/>
+			<ClickBrowser Frame="contentIFrame1" Id="ps_casesubcategoryid_lock"/>
+			<SendTextToBrowser Frame="contentIFrame1" Id="ps_casesubcategoryid_ledit" Value="H -Vefat Teminatı"/>
+			<CompareAnyElementOfClassforVisibility Frame="contentIFrame1" Class="ms-crm-Inline-HasError">
+				<True>
+					<LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi için CRM dosyası açılması sırasında hata alındı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+					<ClickBrowser Id="TabHome"/>
+					<AcceptAlert/>
+				</True>
+				<False>
+					<ClickBrowser Id="incident|NoRelationship|Form|Mscrm.Form.incident.SaveAndClose"/>
+					<LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi için CRM dosyası açıldı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+				</False>
+			</CompareAnyElementOfClassforVisibility>
+		</True>
+		<False>
+			<LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi, CRM dosyası açılmasına uygun değil." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+		</False>
+	</CompareVariableWithValue>
+</Task>

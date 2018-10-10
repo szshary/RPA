@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Task>
+    <!-- Process_Standard_TL_Policies -->
+    <CompareVariableWithValue Variable="CURRENCY_TYPE" Value="TL">
+        <True>
+            <WriteToTN5250 Value="1" Submit="true"/>
+        </True>
+    </CompareVariableWithValue>
+    <!-- Process_Standard_DV_Policies -->
+    <CompareVariableWithValue Variable="CURRENCY_TYPE" Value="DV">
+        <True>
+            <WriteToTN5250 Value="2" Submit="true"/>
+        </True>
+    </CompareVariableWithValue>
+    <WriteToTN5250 Variable="GROUP_CODE" MaxLength="5"/>
+    <WriteToTN5250 Variable="POLICY_CODE" Submit="true" MaxLength="8"/>
+    <!-- Skip_If_Policy_Not_Found -->
+    <CompareValueWithTN5250 Value="Grup" Left="25" Top="13">
+        <True>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin hali hazırda hasar dosyası bulunmaktadır." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+        </True>
+        <False>
+            <WriteToTN5250 Value="24"/>
+            <WriteToTN5250 Value="05"/>
+            <WriteToTN5250 Value="2017"/>
+            <WriteToTN5250 Value="01"/>
+            <WriteToTN5250 Value="31"/>
+            <WriteToTN5250 Variable="DEATH_DAY" MaxLength="2"/>
+            <WriteToTN5250 Variable="DEATH_MONTH" MaxLength="2"/>
+            <WriteToTN5250 Variable="DEATH_YEAR" MaxLength="4"/>
+            <WriteToTN5250 Value="DOĞAL ÖLÜM"/>
+            <SendFunctionKeyToTN5250 FunctionKey="F2"/>
+            <!-- Transfer_Record_Not_Found -->
+            <CompareValueWithTN5250 Value="POLİÇENİN DEVİR KAYDI YOKTUR." Left="14" Top="8">
+                <True>
+                    <WriteToTN5250 Value="" Submit="true"/>
+                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin devir kaydı olmadığı için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                </True>
+                <False>
+                    <CompareValueWithTN5250 Value="VEFAT TARİHİ POLİÇE BİTİM TARİHİNDEN SONRADIR." Left="19" Top="9">
+                        <True>
+                            <WriteToTN5250 Value="" Submit="true"/>
+                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat tarihi poliçe bitim tarihinden sonra olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                        </True>
+                        <False>
+                            <CompareValueWithTN5250 Value="VADE GELİMİ TALİMATI GİTMİŞ." Left="14" Top="7">
+                                <True>
+                                    <WriteToTN5250 Value="" Submit="true"/>
+                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine vade gelimi talimatı gitmiş olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                </True>
+                                <False>
+                                    <CompareValueWithTN5250 Value="VADE GELİMİ DOSYA AÇIMI İŞLEMLERİ" Left="14" Top="8">
+                                        <True>
+                                            <WriteToTN5250 Value="" Submit="true"/>
+                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vade gelimi işlemleri için Süre Sonu Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                        </True>
+                                        <False>
+                                            <CompareValueWithTN5250 Value="GERİ ÇEKME MADDESİNDEN GELEN DEVİR KAYDININ" Left="14" Top="7">
+                                                <True>
+                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine hasar dosyası açılabilmesi için geri çekme maddesinden gelen kaydının günlük karpayına esas hareketlerden atılması gerekmektedir. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                </True>
+                                                <False>
+                                                    <CompareValueWithTN5250 Value="VEFAT TARİHİ SONRASINDA ÖDENMİŞ OLAN PRİMLERİ" Left="14" Top="7">
+                                                        <True>
+                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat sonrası ödenmiş primleri iade edilmediği için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                        </True>
+                                                        <False>
+                                                            <CompareValueWithTN5250 Value="AÇILMIŞTIR. ANCAK AKTüERYA HENüZ POLİÇENİN" Left="14" Top="8">
+                                                                <True>
+                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin hareket kayıtları henüz düzeltilmediği için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                </True>
+                                                                <False>
+                                                                    <CompareValueWithTN5250 Value="YENİ İSTİKRAZI OLDUĞUNDAN İŞLEM YAPILAMAZ." Left="14" Top="7">
+                                                                        <True>
+                                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin istikrazı olduğu için hasar dosyası açılmadı. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                        </True>
+                                                                        <False>
+                                                                            <CompareValueWithTN5250 Value="İSTİKRAZI OLDUĞUNDAN İŞLEM YAPILAMAZ" Left="14" Top="7">
+                                                                                <True>
+                                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin istikrazı olduğu için hasar dosyası açılmadı. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                </True>
+                                                                                <False>
+                                                                                    <CompareValueWithTN5250 Value="POLİÇE VADE GELİMİNE ALINMIŞTIR." Left="14" Top="7">
+                                                                                        <True>
+                                                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi vade gelimine alındığı için hasar dosyası açılmadı. Lütfen Süre Sonu İşlemleri Müdürlüğü ile bağlantıya geçip vade gelimi maddesinin tersinin çalışmasını isteyiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                        </True>
+                                                                                        <False>
+                                                                                            <CompareValueWithTN5250 Value="T.C. KİMLİK NO HATASI ALINMIŞTIR." Left="14" Top="7">	
+                                                                                                <True>
+                                                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine T.C. kimlik numarası sorgulama sırasında hata alındığı için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                </True>
+                                                                                                <False>
+                                                                                                    <CompareValueWithTN5250 Value="VERGİ KİMLİK NUMARASI HATALIDIR." Left="14" Top="8">	
+                                                                                                        <True>
+                                                                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine katılımcının vergi kimlik numarası hatalı olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                        </True>
+                                                                                                        <False>
+                                                                                                            <CompareValueWithTN5250 Value="UYRUK HATALIDIR." Left="14" Top="8">	
+                                                                                                                <True>
+                                                                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine katılımcının uyruğu hatalı olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                                </True>
+                                                                                                                <False>
+                                                                                                                    <CompareValueWithTN5250 Value="VEFAT TARİHİ ÜZERİNDEN 2 YIL GEÇMİŞ OLDUĞUNDAN" Left="11" Top="9">	
+                                                                                                                        <True>
+                                                                                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat tarihinin üzerinden 2 yıldan uzun bir süre geçtiğinden hasar dosyası açılabilmesi için geçiş izni verilmelidir." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                                        </True>
+                                                                                                                        <False>
+                                                                                                                            <CompareValueWithTN5250 Value="SİGORTA DÖNEMİ SONRASINDA ÖDENMİŞ OLAN PRİMLERİN" Left="14" Top="7">	
+                                                                                                                                <True>
+                                                                                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçeye hasar dosyası açılabilmesi için ilk önce sigorta dönemi sonrası ödenmiş primlerinin iade edilmesi gerekmektedir." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                                                </True>
+                                                                                                                                <False>
+                                                                                                                                    <SetVariable Variable="FILE_OPENNED_FLAG" Value="X"/>
+                                                                                                                                    <MoveVariablesToTable Table="Policies_Of_Customers"/>
+                                                                                                                                    <SendFunctionKeyToTN5250 FunctionKey="F4"/>
+                                                                                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                                                                                    <SendFunctionKeyToTN5250 FunctionKey="F6"/>
+                                                                                                                                    <WriteToTN5250 Value="" Submit="true" WaitDuration="3000"/>
+                                                                                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine hasar dosyası açıldı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                                                                                    <SendFunctionKeyToTN5250 FunctionKey="F1"/>
+                                                                                                                                </False>
+                                                                                                                            </CompareValueWithTN5250>
+                                                                                                                        </False>
+                                                                                                                    </CompareValueWithTN5250>
+                                                                                                                </False>
+                                                                                                            </CompareValueWithTN5250>
+                                                                                                        </False>
+                                                                                                    </CompareValueWithTN5250>
+                                                                                                </False>
+                                                                                            </CompareValueWithTN5250>
+                                                                                        </False>
+                                                                                    </CompareValueWithTN5250>
+                                                                                </False>
+                                                                            </CompareValueWithTN5250>
+                                                                        </False>
+                                                                    </CompareValueWithTN5250>
+                                                                </False>
+                                                            </CompareValueWithTN5250>
+                                                        </False>
+                                                    </CompareValueWithTN5250>
+                                                </False>
+                                            </CompareValueWithTN5250>
+                                        </False>
+                                    </CompareValueWithTN5250>
+                                </False>
+                            </CompareValueWithTN5250>
+                        </False>
+                    </CompareValueWithTN5250>
+                </False>
+            </CompareValueWithTN5250>
+        </False>
+    </CompareValueWithTN5250>
+</Task>

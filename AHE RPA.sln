@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rule File Selector", "Rule File Selector\Rule File Selector.csproj", "{4FFFF960-3F42-4914-ADC9-4ECF12759863}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Processes", "Automated Processes", "{775FDF50-1115-4F69-BE97-1EB9FE61E5A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OKS_Received_Transfer_Operation", "OKS_Received_Transfer_Operation", "{441B7CBC-AE1B-4AFE-BAD4-913CB5E71B5B}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\OKS_Received_Transfer_Operation\OKS_Received_Transfer_Operation_Loop.xml = Automated Processes\OKS_Received_Transfer_Operation\OKS_Received_Transfer_Operation_Loop.xml
+		Automated Processes\OKS_Received_Transfer_Operation\OKS_Received_Transfer_Operation_Main.xml = Automated Processes\OKS_Received_Transfer_Operation\OKS_Received_Transfer_Operation_Main.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{B762F489-8023-48D0-B387-D432187568E2}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\OKS_Received_Transfer_Operation\ExcelDocuments\OKES_SBT.xlsx = Automated Processes\OKS_Received_Transfer_Operation\ExcelDocuments\OKES_SBT.xlsx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compensation_File_Creation", "Compensation_File_Creation", "{9AD36E18-FFBB-4586-A556-EB5CC068857C}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Compensation_File_Creation\Create_Compensation_File_Loop.xml = Automated Processes\Compensation_File_Creation\Create_Compensation_File_Loop.xml
+		Automated Processes\Compensation_File_Creation\Create_Compensation_File_Main.xml = Automated Processes\Compensation_File_Creation\Create_Compensation_File_Main.xml
+		Automated Processes\Compensation_File_Creation\Create_CRM_Cases_Loop.xml = Automated Processes\Compensation_File_Creation\Create_CRM_Cases_Loop.xml
+		Automated Processes\Compensation_File_Creation\Create_Customer_Letters_Loop.xml = Automated Processes\Compensation_File_Creation\Create_Customer_Letters_Loop.xml
+		Automated Processes\Compensation_File_Creation\EventLog.txt = Automated Processes\Compensation_File_Creation\EventLog.txt
+		Automated Processes\Compensation_File_Creation\Product_Logic_Loop.xml = Automated Processes\Compensation_File_Creation\Product_Logic_Loop.xml
+		Automated Processes\Compensation_File_Creation\Scrape_Policies_From_Console_Loop.xml = Automated Processes\Compensation_File_Creation\Scrape_Policies_From_Console_Loop.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WordDocumentTemplates", "WordDocumentTemplates", "{4330A59C-5C19-493A-BB9D-C6E26BE8266C}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Compensation_File_Creation\WordDocumentTemplates\SBM vefat.docx = Automated Processes\Compensation_File_Creation\WordDocumentTemplates\SBM vefat.docx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{0C28968E-DDD9-4663-9111-4CF434682BE8}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Compensation_File_Creation\ExcelDocuments\070_Police_vadesi.xlsx = Automated Processes\Compensation_File_Creation\ExcelDocuments\070_Police_vadesi.xlsx
+		Automated Processes\Compensation_File_Creation\ExcelDocuments\PRODREAL.xlsx = Automated Processes\Compensation_File_Creation\ExcelDocuments\PRODREAL.xlsx
+		Automated Processes\Compensation_File_Creation\ExcelDocuments\çalışma2017-1.xlsx = Automated Processes\Compensation_File_Creation\ExcelDocuments\çalışma2017-1.xlsx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Letters", "Letters", "{1EC62F0B-91F3-4C2D-964F-DB3FFA91D24F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credit_Life_Insurance_Calculation", "Credit_Life_Insurance_Calculation", "{8862F28D-D2F7-4A04-B310-4D05F92CC243}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml = Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml
+		Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml
+		Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Peşin.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Peşin.xlsm
+		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Uzun Süreli.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Uzun Süreli.xlsm
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rule Engine", "Rule Engine\Rule Engine.csproj", "{A01BAEB0-C844-4588-9A53-702C7E47AE86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4FFFF960-3F42-4914-ADC9-4ECF12759863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FFFF960-3F42-4914-ADC9-4ECF12759863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FFFF960-3F42-4914-ADC9-4ECF12759863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FFFF960-3F42-4914-ADC9-4ECF12759863}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01BAEB0-C844-4588-9A53-702C7E47AE86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01BAEB0-C844-4588-9A53-702C7E47AE86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01BAEB0-C844-4588-9A53-702C7E47AE86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01BAEB0-C844-4588-9A53-702C7E47AE86}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{441B7CBC-AE1B-4AFE-BAD4-913CB5E71B5B} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
+		{B762F489-8023-48D0-B387-D432187568E2} = {441B7CBC-AE1B-4AFE-BAD4-913CB5E71B5B}
+		{9AD36E18-FFBB-4586-A556-EB5CC068857C} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
+		{4330A59C-5C19-493A-BB9D-C6E26BE8266C} = {9AD36E18-FFBB-4586-A556-EB5CC068857C}
+		{0C28968E-DDD9-4663-9111-4CF434682BE8} = {9AD36E18-FFBB-4586-A556-EB5CC068857C}
+		{1EC62F0B-91F3-4C2D-964F-DB3FFA91D24F} = {9AD36E18-FFBB-4586-A556-EB5CC068857C}
+		{8862F28D-D2F7-4A04-B310-4D05F92CC243} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
+		{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65} = {8862F28D-D2F7-4A04-B310-4D05F92CC243}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4222838C-204F-42F9-981D-17CB5D00BBC6}
+	EndGlobalSection
+EndGlobal

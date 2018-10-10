@@ -1,0 +1,53 @@
+<Task>
+    <CompareVariableWithValue Variable="DURUMU" Value="AÇIK">
+        <True>
+            <CompareVariableWithValue Variable="LETTERS_SENT" Value="X">
+                <False>
+                    <SetColumnInTable Table="Heir_Exists_During_Jeopardy_List" Column="LETTERS_SENT" Value="X" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND DURUMU='AÇIK'" ParameterVariables="SIGORTALI_KIMLIK_NO"/>
+                    <ExtractVariablesFromTable Table="Policies_Of_Customers" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND FILE_OPENNED_FLAG='X'" ParameterVariables="SIGORTALI_KIMLIK_NO" SingleOutputTextFormat="{0}/{1}" MultipleOutputTextFormat="{0}/{1}, " OutputVariable="POLICIES" CountVariable="POLICIES_COUNT"/>
+                    <CompareVariableWithValue Variable="POLICIES_COUNT" Value="0">
+                        <False>
+                            <ExtractVariablesFromTable Table="Heir_Exists_During_Jeopardy_List" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND TRIM(DURUMU)='AÇIK' AND TRIM(ACIK_ADRES)='{1}' AND LETTERS_SENT='X'" ParameterVariables="SIGORTALI_KIMLIK_NO,ACIK_ADRES" SingleOutputTextFormat="{0} {1}" MultipleOutputTextFormat="{0} {1}, " Columns="AD,SOYAD" OutputVariable="BENEFICIARY_FULLNAME"/>
+                            <FillPlainTextContentControl Tag="LETTER_COUNTER" Variable="LETTER_COUNTER"/>
+                            <CompareVariableWithValue Variable="ACIK_ADRES" Value="">
+                                <True>
+                                    <LogEvent Format="{0} TC Kimlik Numaralı {1}'ın açık adresi olmadığı için mektup hazırlanmadı." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME"/>
+                                </True>
+                                <False>
+                                    <SetVariable Variable="POLICIES_TEXT" Value=""/>
+                                    <SetVariable Variable="POLICIES_TEXT" ConcatenateVariable="POLICIES"/>
+                                    <CompareVariableWithValue Variable="POLICIES_COUNT" Value="1">
+                                        <True>
+                                            <SetVariable Variable="POLICIES_TEXT" ConcatenateText=" numaralı poliçe"/>
+                                        </True>
+                                        <False>
+                                            <SetVariable Variable="POLICIES_TEXT" ConcatenateText=" numaralı poliçeler"/>
+                                        </False>
+                                    </CompareVariableWithValue>
+                                    <StoreQueryResultToVariables SelectQuery="SELECT CONCAT(CONCAT(TRIM(A.MSTADI), ' '), TRIM(A.MSTSOY)) AS DECEASED_NAME FROM CGNLLIB.PFMUSKIS A WHERE A.MUSNO = {0} FETCH FIRST 1 ROWS ONLY" ParameterVariables="SIGORTALI_KIMLIK_NO"/>
+                                    <FillPlainTextContentControl Tag="POLICIES" Variable="POLICIES"/>
+                                    <FillPlainTextContentControl Tag="BENEFICIARY_FULLNAME" Variable="BENEFICIARY_FULLNAME"/>
+                                    <FillPlainTextContentControl Tag="BENEFICIARY_ADDRESS" Variable="ACIK_ADRES"/>
+                                    <FillPlainTextContentControl Tag="POLICIES_TEXT" Variable="POLICIES_TEXT"/>
+                                    <FillPlainTextContentControl Tag="DECEASED_NAME" Variable="DECEASED_NAME"/>
+                                    <SaveDocumentAsNewFile FileName="SBM VEFAT_" Folder="Letters" SuffixVariable="LETTER_COUNTER"/>
+                                    <SetVariable Variable="LETTER_COUNTER" Increment="1"/>
+                                </False>
+                            </CompareVariableWithValue>
+                        </False>
+                    </CompareVariableWithValue>
+                </False>
+            </CompareVariableWithValue>
+        </True>
+    </CompareVariableWithValue>
+    <CompareVariableWithValue Variable="DURUMU" Value="ÖLÜM">
+        <True>
+            <LogEvent Format="{0} TC Kimlik Numaralı {1}, {2} tarihinde vefat ettiği için mektup gönderilmeyecek." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME,VEFAT_TARIHI1"/>
+        </True>
+    </CompareVariableWithValue>
+    <CompareVariableWithValue Variable="DURUMU" Value="VATANDAŞLIKTAN ÇIKMA">
+        <True>
+            <LogEvent Format="{0} TC Kimlik Numaralı {1} vatandaşlıktan çıktığı için mektup gönderilmeyecek." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME"/>
+        </True>
+    </CompareVariableWithValue>
+</Task>

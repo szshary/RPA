@@ -1,0 +1,44 @@
+﻿<Task>
+  <!-- Process SBT Transfer -->
+  <Phase Name="Process">
+    <CompareVariableWithValue Variable="IS_PROCESSED" Value="X">
+      <False>
+        <SetVariable Variable="IS_ROW_MATCH_FOUND" Value="False"/>
+
+        <WaitBrowser ExpectedCondition="InvisibilityOfElementLocated" Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:lovTF:1:formTemplate1:qxmit1::content"/>
+        <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:cil1::icon"/>
+        <SendTextToBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:lovTF:1:formTemplate1:qxmit1::content" Variable="COMPANY_ID"/>
+        <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:lovTF:1:formTemplate1:searchBtn::icon"/>
+        <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:lovTF:1:formTemplate1:peopleTable:0:qxmot2"/>
+        <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:lovTF:1:formTemplate1:okBtn::icon"/>
+
+        <StoreExcelDateToVariables Variable="ARRIVAL_DATE_TICKS" DayVariable="ARRIVAL_DAY" MonthVariable="ARRIVAL_MONTH" YearVariable="ARRIVAL_YEAR"/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" Value=""/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" ConcatenateVariable="ARRIVAL_DAY"/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" ConcatenateText="-"/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" ConcatenateVariable="ARRIVAL_MONTH"/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" ConcatenateText="-"/>
+        <SetVariable Variable="ARRIVAL_DATE_PROPER" ConcatenateVariable="ARRIVAL_YEAR"/>
+        <SendTextToBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:id1::content" Variable="ARRIVAL_DATE_PROPER"/>
+
+        <CompareVariableWithValue Variable="IS_ROW_MATCH_FOUND" Value="False">
+          <True>
+            <CompareValueWithIdContent Value="17" Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:pc1:t1:0:ot1">
+              <True>
+                <CompareVariableWithIdContent Variable="SBT_ID" Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:pc1:t1:0:ot30">
+                  <True>
+                    <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:r1:0:r_j_id2831233:0:pc1:t1:0:ot30"/>
+                    <SetVariable Variable="IS_ROW_MATCH_FOUND" Value="True"/>
+                    <SetColumnInTable Table="SBT_Transfers" Column="IS_PROCESSED" Value="X" SelectQuery="SBT_ID={0}" ParameterVariables="SBT_ID"/>
+                  </True>
+                </CompareVariableWithIdContent>
+              </True>
+            </CompareValueWithIdContent>
+          </True>
+        </CompareVariableWithValue>
+
+        <!-- <ClickBrowser Id="pageTemplate:mainRegion:1:tpipt1:cb2"/> -->
+      </False>
+    </CompareVariableWithValue>
+  </Phase>
+</Task>

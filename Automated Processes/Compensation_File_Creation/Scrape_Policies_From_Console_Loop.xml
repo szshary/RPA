@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Task>
+	<!-- Customer_Already_Querried -->
+	<CompareVariableWithTN5250 Variable="SIGORTALI_KIMLIK_NO" Left="18" Top="4" Length="11">
+		<False>
+			<WriteToTN5250 Value="" Submit="true"/>
+			<WriteToTN5250 Variable="SIGORTALI_KIMLIK_NO" Submit="true"/>
+			<!-- Skip_If_Customer_No_Not_Found -->
+			<CompareValueWithTN5250 Value="GÖRÜNTÜLENEBİLECEK BİR BİLGİ BULUNMAMAKTADIR." Left="20" Top="12">
+				<True>
+					<LogEvent Format="{0} TC kimlik numaralı müşterinin sistemde kayıtlı poliçesi bulunamadı." Variables="SIGORTALI_KIMLIK_NO"/>
+				</True>
+				<False>
+					<ScrapeFromTN5250 Left="3" Top="7" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="7" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="7" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="8" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="8" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="8" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="9" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="9" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="9" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="10" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="10" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="10" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="11" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="11" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="11" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="12" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="12" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="12" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="13" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="13" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="13" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="14" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="14" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="14" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="15" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="15" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="15" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+					<ScrapeFromTN5250 Left="3" Top="16" Length="5" Variable="GROUP_CODE"/>
+					<ScrapeFromTN5250 Left="9" Top="16" Length="8" Variable="POLICY_CODE"/>
+					<ScrapeFromTN5250 Left="62" Top="16" Length="5" Variable="SEVK_CODE"/>
+					<MoveVariablesToTable Table="Policies_Of_Customers"/>
+				</False>
+			</CompareValueWithTN5250>
+		</False>
+	</CompareVariableWithTN5250>
+</Task>
