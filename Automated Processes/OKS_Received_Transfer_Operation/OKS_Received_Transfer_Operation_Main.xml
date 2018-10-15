@@ -28,4 +28,4 @@
 		<LoopThroughTable FileName="OKS_Received_Transfer_Operation_Loop.xml" Table="SBT_Transfers"/>
 	</Phase>
   </BrowserSession>
-</Task>
+</Task> 
