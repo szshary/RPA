@@ -1,7 +1,7 @@
 ﻿<Phase Name="FunctionTrial">
   <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="ROW_VAL"/>
   <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="ROW_VAL"/>
-  <DatabaseSession Host="10.10.10.106" User="BIM2456" Password="V1ND1C4T3">
+  <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="H4RB1NG3R">
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT DISTINCT A.TEDSEK, (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR, (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL))
 AS DOGTAR, (A.MUDYIL*12+A.MUDAY) AS MUDSUR FROM CHAYDAT.HAYESDET A INNER JOIN CGNLLIB.PFMUSKIS B ON A.MUSID = B.MUSID WHERE A.GRP = @GRP AND A.POL = @POL UNION ALL SELECT DISTINCT A.TEDSEK, (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR, (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL)) AS DOGTAR, (A.MUDYIL*12+A.MUDAY) AS MUDSUR FROM CKTCHAY.HAYESDET A
 INNER JOIN CGNLLIB.PFMUSKIS B ON A.MUSID = B.MUSID WHERE A.GRP = @GRP AND A.POL = @POL;"/>

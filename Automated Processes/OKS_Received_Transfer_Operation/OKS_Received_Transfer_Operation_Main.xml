@@ -16,8 +16,8 @@
 	<!-- INSIS PROD Login -->
   <BrowserSession URL="http://ahefeniksprod.anadoluhayat.com.tr/insis_gen_v10/faces/login.jspx">
     <Phase Name="Login">
-		<SendTextToBrowser Id="pt1:pt_s2:usrname::content" Value="BIM2456"/>
-		<SendTextToBrowser Id="pt1:pt_s2:pswd::content" Value="V1nd1c4t3"/>
+		<SendTextToBrowser Id="pt1:pt_s2:usrname::content" Value="PRO2456"/>
+		<SendTextToBrowser Id="pt1:pt_s2:pswd::content" Value="H4rb1ng3r"/>
 		<ClickBrowser Id="pt1:pt_s2:login::icon"/>
 		<ClickBrowser Id="pageTemplate:treeMenu:1:treeMenuLink"/>
 		<ClickBrowser Id="pageTemplate:treeMenu:8:treeMenuLink"/>
