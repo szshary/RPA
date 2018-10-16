@@ -21,7 +21,7 @@ namespace Rule_File_Selector
                 DefaultExt = ".xml",
                 Filter = "XML Dosyaları (*.xml)|*.xml",
                 CheckFileExists = true,
-                InitialDirectory = @"\\BIM2456\Users\BIM2456\Documents\Visual Studio 2017\Projects\AHE RPA\Automated Processes"
+                InitialDirectory = @"\\PRO2456\Users\BIM2456\Documents\Visual Studio 2017\Projects\AHE RPA\Automated Processes"
             };
 
             if (ruleFileDialog.ShowDialog() == true)
