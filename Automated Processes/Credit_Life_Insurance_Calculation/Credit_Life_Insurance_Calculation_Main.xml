@@ -2,6 +2,7 @@
   <Optional>
     <ExcelSession Folder="ExcelDocuments" FileName="Uzun Süreli.xlsm">
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
+      <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
       <LoopUntilEqualityAchieved Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Long_Term_Loop.xml"/>
     </ExcelSession>
@@ -9,6 +10,7 @@
   <Optional Name="Process_Prepayment">
     <ExcelSession Folder="ExcelDocuments" FileName="Peşin.xlsm">
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
+      <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
       <LoopUntilEqualityAchieved Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Prepayment_Loop.xml"/>
     </ExcelSession>
