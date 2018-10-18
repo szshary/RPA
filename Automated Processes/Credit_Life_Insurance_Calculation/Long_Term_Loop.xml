@@ -1,6 +1,6 @@
 ﻿<Phase Name="FunctionTrial">
-  <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="ROW_VAL"/>
-  <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="ROW_VAL"/>
+  <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="CURRENT_ROW"/>
+  <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="CURRENT_ROW"/>
   <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="H4RB1NG3R">
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT DISTINCT A.TEDSEK,
     (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR, (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL))
@@ -9,7 +9,8 @@
     (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR, (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL)) AS DOGTAR,
     (A.MUDYIL*12+A.MUDAY) AS MUDSUR, C.BSMV, C.KKDF, C.KRDFA FROM CKTCHAY.HAYESDET A INNER JOIN CGNLLIB.PFMUSKIS B ON A.MUSID = B.MUSID INNER JOIN
     CHAYDAT.PFPOLCRM C ON A.TKFNUM = C.TEKREF WHERE A.GRP = @GRP AND A.POL = @POL;"/>
-    <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT A.TMNTUT FROM CHAYDAT.PFTEMINU A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND A.POL = @POL UNION ALL SELECT A.TMNTUT FROM CKTCHAY.PFTEMINU A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND A.POL = @POL;"/>
+    <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT A.TMNTUT FROM CHAYDAT.PFTEMINU A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND
+    A.POL = @POL UNION ALL SELECT A.TMNTUT FROM CKTCHAY.PFTEMINU A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND A.POL = @POL;"/>
   </DatabaseSession>
   <!-- C4 -->
   <WriteToExcelCell TargetWorksheet="Hesap" Variable="GRP" TargetColumn="3" TargetRow="4"/>
@@ -30,23 +31,23 @@
   <CompareVariableWithValue Variable="TEDSEK" Value="0">
     <True>
       <!-- K9 -->
-      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="9" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="ROW_VAL"/>
-      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="6" TargetRowVariable="ROW_VAL"/>
-      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="5" TargetRowVariable="ROW_VAL"/>
-      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="4" TargetRowVariable="ROW_VAL"/>
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="9" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="CURRENT_ROW"/>
+      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
+      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
+      <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
     </True>
   </CompareVariableWithValue>
   <CompareVariableWithValue Variable="TEDSEK" Value="1">
     <True>
       <!-- K7 -->
-      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="ROW_VAL"/>
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="CURRENT_ROW"/>
       <!-- K6 -->
-      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="6" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="ROW_VAL"/>
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="6" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
       <!-- K5 -->
-      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="5" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="ROW_VAL"/>
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="5" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
       <!-- K4 -->
-      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="ROW_VAL"/>
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
     </True>
   </CompareVariableWithValue>
-  <SetVariable Variable="ROW_VAL" Increment="1"/>
+  <SetVariable Variable="CURRENT_ROW" Increment="1"/>
 </Phase>

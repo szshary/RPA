@@ -20,7 +20,7 @@ namespace RPA.Core
             _activeRuleSets = new Stack<RuleSet>();
             _activeRuleSets.Push(new DefaultRuleSet());
 
-            _elementStartRules.Add("EndlessLoopUntilVariableAndValueEqual", EndlessLoopUntilVariableAndValueEqual);
+            _elementStartRules.Add("LoopUntilEqualityAchieved", LoopUntilEqualityAchieved);
             _elementStartRules.Add("LoopThroughTable", LoopThroughTable);
             _elementStartRules.Add("ProcessTaskFile", ProcessTaskFile);
 
@@ -84,13 +84,23 @@ namespace RPA.Core
             _activeRuleSets.Pop();
         }
 
-        private void EndlessLoopUntilVariableAndValueEqual(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void LoopUntilEqualityAchieved(Dictionary<String, String> parameters, RuleEngineState engineState)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && parameters.ContainsKey("Value"))
+            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && engineState.VariableCollection.ContainsKey(parameters["OtherVariable"]))))
             {
-                while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
+                if (parameters.ContainsKey("Value"))
                 {
-                    ProcessTaskFile(parameters, engineState);
+                    while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
+                    {
+                        ProcessTaskFile(parameters, engineState);
+                    }
+                }
+                else
+                {
+                    while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(engineState.VariableCollection[parameters["OtherVariable"]].ToString()))
+                    {
+                        ProcessTaskFile(parameters, engineState);
+                    }
                 }
             }
         }

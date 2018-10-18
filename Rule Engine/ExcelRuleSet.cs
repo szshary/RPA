@@ -14,6 +14,7 @@ namespace RPA.Core
 
         public ExcelRuleSet(RuleSet _ruleSet) : base(_ruleSet)
         {
+            _elementStartRules.Add("StoreUsedRangeRowCountToVariable", StoreUsedRangeRowCountToVariable);
             _elementStartRules.Add("StoreExcelCellToVariable", StoreExcelCellToVariable);
             _elementStartRules.Add("StoreExcelRangeToTable", StoreExcelRangeToTable);
             _elementStartRules.Add("CopyExcelCellToExcelCell", CopyExcelCellToExcelCell);
@@ -33,6 +34,23 @@ namespace RPA.Core
                 }
             }
             return false;
+        }
+
+        private void StoreUsedRangeRowCountToVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        {
+            if (parameters.ContainsKey("Variable") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
+            {
+                Range excelRange = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].UsedRange;
+
+                if (engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                {
+                    engineState.VariableCollection[parameters["Variable"]] = excelRange.Rows.Count;
+                }
+                else
+                {
+                    engineState.VariableCollection.Add(parameters["Variable"], excelRange.Rows.Count);
+                }
+            }
         }
 
         private void StoreExcelCellToVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
