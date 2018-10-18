@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Xml;
+using System.Windows;
 
 namespace RPA.Core
 {
@@ -123,6 +124,13 @@ namespace RPA.Core
                         Dictionary<String, String> actionParameters = new Dictionary<String, String>();
                         while (readerXML.Read())
                         {
+                            actionParameters.Clear();
+                            for (int attCnt = 0; attCnt < readerXML.AttributeCount; attCnt++)
+                            {
+                                readerXML.MoveToAttribute(attCnt);
+                                actionParameters.Add(readerXML.Name, readerXML.Value);
+                            }
+                            readerXML.MoveToElement();
                             switch (readerXML.NodeType)
                             {
                                 case XmlNodeType.Element:
@@ -140,14 +148,13 @@ namespace RPA.Core
                                                 readerXML.Skip();
                                             }
                                             break;
-                                        default:
-                                            actionParameters.Clear();
-                                            for (int attCnt = 0; attCnt < readerXML.AttributeCount; attCnt++)
+                                        case "Optional":
+                                            if (MessageBox.Show(String.Format("Would you like to process {0} optional section?", actionParameters.ContainsKey("Name") ? actionParameters["Name"] : "the following"), "Optional Section Execution Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.No)
                                             {
-                                                readerXML.MoveToAttribute(attCnt);
-                                                actionParameters.Add(readerXML.Name, readerXML.Value);
+                                                readerXML.Skip();
                                             }
-                                            readerXML.MoveToElement();
+                                            break;
+                                        default:
                                             ExecuteElementStartRule(readerXML.Name, actionParameters, engineState);
                                             break;
                                     }
@@ -157,6 +164,7 @@ namespace RPA.Core
                                     {
                                         case "True":
                                         case "False":
+                                        case "Optional":
                                             break;
                                         default:
                                             ExecuteElementEndRule(readerXML.Name, engineState);

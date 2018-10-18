@@ -1,10 +1,14 @@
 ﻿<Task>
-  <ExcelSession Folder="ExcelDocuments" FileName="Uzun Süreli.xlsm">   
-    <SetVariable Variable="ROW_VAL" Value="2"/>
-    <EndlessLoopUntilVariableAndValueEqual Variable="ROW_VAL" Value="7" FileName="Long_Term_Loop.xml"/>
-  </ExcelSession>
-  <ExcelSession Folder="ExcelDocuments" FileName="Peşin.xlsm">
-    <SetVariable Variable="ROW_VAL" Value="2"/>
-    <EndlessLoopUntilVariableAndValueEqual Variable="ROW_VAL" Value="5" FileName="Prepayment_Loop.xml"/>
-  </ExcelSession>
+  <Optional>
+    <ExcelSession Folder="ExcelDocuments" FileName="Uzun Süreli.xlsm">
+      <SetVariable Variable="ROW_VAL" Value="2"/>
+      <EndlessLoopUntilVariableAndValueEqual Variable="ROW_VAL" Value="9" FileName="Long_Term_Loop.xml"/>
+    </ExcelSession>
+  </Optional>
+  <Optional Name="Process_Prepayment">
+    <ExcelSession Folder="ExcelDocuments" FileName="Peşin.xlsm">
+      <SetVariable Variable="ROW_VAL" Value="2"/>
+      <EndlessLoopUntilVariableAndValueEqual Variable="ROW_VAL" Value="13" FileName="Prepayment_Loop.xml"/>
+    </ExcelSession>
+  </Optional>
 </Task>
