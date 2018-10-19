@@ -215,10 +215,9 @@ namespace RPA.Core
                         {
                             for (int j = 0; j < table.Columns.Count; j++)
                             {
-                                _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow + i, targetColumn + j].Value = table.Rows[i].ItemArray[j].ToString();
+                                _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow + i, targetColumn + j].Value = table.Rows[i].ItemArray[j];
                             }
                         }
-
                     }
                 }
             }
