@@ -42,7 +42,7 @@
       <WriteToExcelCell TargetWorksheet="Otomasyon" Value="X" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
     </True>
   </CompareVariableWithValue>
-  <CompareVariableWithValue Variable="TEDSEK" Value="0">
+  <CompareVariableWithValue Variable="TEDSEK" Value="1">
     <True>
       <CompareVariableWithValue Variable="PESIN_YILLIK" Value="P">
         <True>
