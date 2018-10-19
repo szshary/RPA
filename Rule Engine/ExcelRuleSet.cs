@@ -173,7 +173,8 @@ namespace RPA.Core
 
         private void WriteToExcelCell(Dictionary<String, String> parameters, RuleEngineState engineState)
         {
-            if ((parameters.ContainsKey("Value") ^ (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"])))
+            if ((parameters.ContainsKey("Value") ^ (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                ^ (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); })))
                 && parameters.ContainsKey("TargetWorksheet") && CheckWorksheetExists(parameters["TargetWorksheet"])
                 && (parameters.ContainsKey("TargetRow") ^ parameters.ContainsKey("TargetRowVariable"))
                 && (parameters.ContainsKey("TargetColumn") ^ parameters.ContainsKey("TargetColumnVariable")))
@@ -202,9 +203,22 @@ namespace RPA.Core
                     {
                         _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = parameters["Value"];
                     }
-                    else
+                    else if (parameters.ContainsKey("Variable"))
                     {
                         _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = engineState.VariableCollection[parameters["Variable"]];
+                    }
+                    else
+                    {
+                        System.Data.DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+
+                        for (int i = 0; i < table.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < table.Columns.Count; j++)
+                            {
+                                _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow + i, targetColumn + j].Value = table.Rows[i].ItemArray[j].ToString();
+                            }
+                        }
+
                     }
                 }
             }

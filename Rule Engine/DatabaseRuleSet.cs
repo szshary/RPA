@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RPA.Core
 {
@@ -55,20 +56,31 @@ namespace RPA.Core
             {
                 using (DataTable table = new DataTable(parameters["Table"]))
                 {
-                    using (iDB2DataAdapter adapter = new iDB2DataAdapter(parameters["SelectQuery"], _dB2connection))
+                    using (iDB2Command command = new iDB2Command(parameters["SelectQuery"], _dB2connection))
                     {
-                        adapter.SelectCommand.CommandTimeout = 500000;
+                        command.CommandTimeout = 500000;
                         if (parameters.ContainsKey("ParameterVariables"))
                         {
+                            Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                             foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                             {
                                 if (engineState.VariableCollection.ContainsKey(str))
                                 {
-                                    adapter.SelectCommand.Parameters.Add(str, engineState.VariableCollection[str]);
+                                    if (numberRegex.IsMatch(engineState.VariableCollection[str].ToString()))
+                                    {
+                                        command.Parameters.AddWithValue(str, engineState.VariableCollection[str].ToString());
+                                    }
+                                    else
+                                    {
+                                        command.Parameters.AddWithValue(str, String.Format("'{0}'", engineState.VariableCollection[str].ToString()));
+                                    }
                                 }
                             }
                         }
-                        adapter.Fill(table);
+                        using (iDB2DataReader reader = command.ExecuteReader())
+                        {
+                            table.Load(reader);
+                        }
                         if (engineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
                         {
                             engineState.TableCollection.Remove(engineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
@@ -87,11 +99,19 @@ namespace RPA.Core
                 command.CommandTimeout = 500000;
                 if (parameters.ContainsKey("ParameterVariables"))
                 {
+                    Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                     foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (engineState.VariableCollection.ContainsKey(str))
                         {
-                            command.Parameters.AddWithValue(str, engineState.VariableCollection[str].ToString());
+                            if (numberRegex.IsMatch(engineState.VariableCollection[str].ToString()))
+                            {
+                                command.Parameters.AddWithValue(str, engineState.VariableCollection[str].ToString());
+                            }
+                            else
+                            {
+                                command.Parameters.AddWithValue(str, String.Format("'{0}'", engineState.VariableCollection[str].ToString()));
+                            }
                         }
                     }
                 }
