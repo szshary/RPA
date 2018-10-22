@@ -31,6 +31,8 @@
   <WriteToExcelCell TargetWorksheet="Hesap" Variable="KKDF" TargetColumn="3" TargetRow="15"/>
   <!-- C16 -->
   <WriteToExcelCell TargetWorksheet="Hesap" Variable="KRDFA" TargetColumn="3" TargetRow="16"/>
+  <!-- F14-F180 -->
+  <ClearExcelRange TargetWorksheet="Hesap" StartColumn="6" StartRow="14" EndColumn="6" EndRow="180"/>
   <!-- F14 -->
   <WriteToExcelCell TargetWorksheet="Hesap" Table="TEMINATLAR" TargetColumn="6" TargetRow="14"/>
   <CompareVariableWithValue Variable="TEDSEK" Value="0">
@@ -55,9 +57,7 @@
           <!-- J4 -->
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
         </True>
-      </CompareVariableWithValue>
-      <CompareVariableWithValue Variable="PESIN_YILLIK" Value="Y">
-        <True>
+        <False>
           <!-- K7 -->
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="CURRENT_ROW"/>
           <!-- K6 -->
@@ -66,7 +66,7 @@
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="5" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
           <!-- K4 -->
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="11" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
-        </True>
+        </False>
       </CompareVariableWithValue>
     </True>
   </CompareVariableWithValue>

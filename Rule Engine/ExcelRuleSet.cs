@@ -14,10 +14,11 @@ namespace RPA.Core
 
         public ExcelRuleSet(RuleSet _ruleSet) : base(_ruleSet)
         {
+            _elementStartRules.Add("ClearExcelRange", ClearExcelRange);
+            _elementStartRules.Add("CopyExcelCellToExcelCell", CopyExcelCellToExcelCell);
             _elementStartRules.Add("StoreUsedRangeRowCountToVariable", StoreUsedRangeRowCountToVariable);
             _elementStartRules.Add("StoreExcelCellToVariable", StoreExcelCellToVariable);
             _elementStartRules.Add("StoreExcelRangeToTable", StoreExcelRangeToTable);
-            _elementStartRules.Add("CopyExcelCellToExcelCell", CopyExcelCellToExcelCell);
             _elementStartRules.Add("WriteToExcelCell", WriteToExcelCell);
 
             _elementStartRules.Add("ExcelSession", StartExcelSession);
@@ -34,6 +35,105 @@ namespace RPA.Core
                 }
             }
             return false;
+        }
+
+        private void ClearExcelRange(Dictionary<String, String> parameters, RuleEngineState engineState)
+        {
+            if (parameters.ContainsKey("TargetWorksheet") && CheckWorksheetExists(parameters["TargetWorksheet"])
+                && (parameters.ContainsKey("StartRow") ^ parameters.ContainsKey("StartRowVariable"))
+                && (parameters.ContainsKey("StartColumn") ^ parameters.ContainsKey("StartColumnVariable"))
+                && (parameters.ContainsKey("EndRow") ^ parameters.ContainsKey("EndRowVariable"))
+                && (parameters.ContainsKey("EndColumn") ^ parameters.ContainsKey("EndColumnVariable")))
+            {
+                int startRow = 0, startColumn = 0, endRow = 0, endColumn = 0;
+
+                if (parameters.ContainsKey("StartRow"))
+                {
+                    Int32.TryParse(parameters["StartRow"], out startRow);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["StartRowVariable"]].ToString(), out startRow);
+                }
+                if (parameters.ContainsKey("StartColumn"))
+                {
+                    Int32.TryParse(parameters["StartColumn"], out startColumn);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["StartColumnVariable"]].ToString(), out startColumn);
+                }
+                if (parameters.ContainsKey("EndRow"))
+                {
+                    Int32.TryParse(parameters["EndRow"], out endRow);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["EndRowVariable"]].ToString(), out endRow);
+                }
+                if (parameters.ContainsKey("EndColumn"))
+                {
+                    Int32.TryParse(parameters["EndColumn"], out endColumn);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["EndColumnVariable"]].ToString(), out endColumn);
+                }
+                if (startRow != 0 && startColumn != 0 && endRow != 0 && endColumn != 0)
+                {
+                    Worksheet targetSheet = _excelWorkbook.Sheets[parameters["TargetWorksheet"]];
+                    targetSheet.Range[targetSheet.Cells[startRow, startColumn], targetSheet.Cells[endRow, endColumn]].Clear();
+                }
+            }
+        }
+
+        private void CopyExcelCellToExcelCell(Dictionary<String, String> parameters, RuleEngineState engineState)
+        {
+            if (parameters.ContainsKey("SourceWorksheet") && parameters.ContainsKey("TargetWorksheet")
+                && (parameters.ContainsKey("SourceRow") ^ parameters.ContainsKey("SourceRowVariable"))
+                && (parameters.ContainsKey("SourceColumn") ^ parameters.ContainsKey("SourceColumnVariable"))
+                && (parameters.ContainsKey("TargetRow") ^ parameters.ContainsKey("TargetRowVariable"))
+                && (parameters.ContainsKey("TargetColumn") ^ parameters.ContainsKey("TargetColumnVariable")))
+            {
+                int sourceRow = 0, sourceColumn = 0, targetRow = 0, targetColumn = 0;
+
+                if (parameters.ContainsKey("SourceRow"))
+                {
+                    Int32.TryParse(parameters["SourceRow"], out sourceRow);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
+                }
+                if (parameters.ContainsKey("SourceColumn"))
+                {
+                    Int32.TryParse(parameters["SourceColumn"], out sourceColumn);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
+                }
+                if (parameters.ContainsKey("TargetRow"))
+                {
+                    Int32.TryParse(parameters["TargetRow"], out targetRow);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
+                }
+                if (parameters.ContainsKey("TargetColumn"))
+                {
+                    Int32.TryParse(parameters["TargetColumn"], out targetColumn);
+                }
+                else
+                {
+                    Int32.TryParse(engineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
+                }
+                if (sourceRow != 0 && sourceColumn != 0 && targetRow != 0 && targetColumn != 0)
+                {
+                    _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value;
+                }
+            }
         }
 
         private void StoreUsedRangeRowCountToVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
@@ -118,55 +218,6 @@ namespace RPA.Core
                     }
                     table.TableName = parameters["Table"];
                     engineState.TableCollection.Add(table);
-                }
-            }
-        }
-
-        private void CopyExcelCellToExcelCell(Dictionary<String, String> parameters, RuleEngineState engineState)
-        {
-            if (parameters.ContainsKey("SourceWorksheet") && parameters.ContainsKey("TargetWorksheet")
-                && (parameters.ContainsKey("SourceRow") ^ parameters.ContainsKey("SourceRowVariable"))
-                && (parameters.ContainsKey("SourceColumn") ^ parameters.ContainsKey("SourceColumnVariable"))
-                && (parameters.ContainsKey("TargetRow") ^ parameters.ContainsKey("TargetRowVariable"))
-                && (parameters.ContainsKey("TargetColumn") ^ parameters.ContainsKey("TargetColumnVariable")))
-            {
-                int sourceRow = 0, sourceColumn = 0, targetRow = 0, targetColumn = 0;
-
-                if (parameters.ContainsKey("SourceRow"))
-                {
-                    Int32.TryParse(parameters["SourceRow"], out sourceRow);
-                }
-                else
-                {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
-                }
-                if (parameters.ContainsKey("SourceColumn"))
-                {
-                    Int32.TryParse(parameters["SourceColumn"], out sourceColumn);
-                }
-                else
-                {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
-                }
-                if (parameters.ContainsKey("TargetRow"))
-                {
-                    Int32.TryParse(parameters["TargetRow"], out targetRow);
-                }
-                else
-                {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
-                }
-                if (parameters.ContainsKey("TargetColumn"))
-                {
-                    Int32.TryParse(parameters["TargetColumn"], out targetColumn);
-                }
-                else
-                {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
-                }
-                if (sourceRow != 0 && sourceColumn != 0 && targetRow != 0 && targetColumn != 0)
-                {
-                    _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value;
                 }
             }
         }
