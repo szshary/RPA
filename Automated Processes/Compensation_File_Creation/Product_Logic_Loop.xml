@@ -5,7 +5,7 @@
     <CompareVariableWithValue Variable="SEVK_CODE" Value="28000">
       <True>
          <LookUpTable Table="Group_Types" PrimaryKeyVariables="GROUP_CODE" RetrieveColumns="GROUP_TYPE,CURRENCY_TYPE" StoreAtVariables="GROUP_TYPE,CURRENCY_TYPE"/>
-         <ProcessTaskFile FileName="Create_Compensation_File_Loop.xml"/>
+         <ExecuteTaskFile FileName="Create_Compensation_File_Sub.xml"/>
      </True>
      <False>
         <CompareVariableWithValue Variable="SEVK_CODE" Value="52000">

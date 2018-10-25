@@ -22,7 +22,7 @@ namespace RPA.Core
 
             _elementStartRules.Add("LoopUntilEqualityAchieved", LoopUntilEqualityAchieved);
             _elementStartRules.Add("LoopThroughTable", LoopThroughTable);
-            _elementStartRules.Add("ProcessTaskFile", ProcessTaskFile);
+            _elementStartRules.Add("ExecuteTaskFile", ExecuteTaskFile);
 
             _elementStartRules.Add("BrowserSession", AddBrowserRuleSet);
             _elementEndRules.Add("BrowserSession", ShrinkRuleSet);
@@ -92,14 +92,14 @@ namespace RPA.Core
                 {
                     while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
                     {
-                        ProcessTaskFile(parameters, engineState);
+                        ExecuteTaskFile(parameters, engineState);
                     }
                 }
                 else
                 {
                     while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(engineState.VariableCollection[parameters["OtherVariable"]].ToString()))
                     {
-                        ProcessTaskFile(parameters, engineState);
+                        ExecuteTaskFile(parameters, engineState);
                     }
                 }
             }
@@ -118,12 +118,12 @@ namespace RPA.Core
                             engineState.VariableCollection[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
                         }
                     }
-                    ProcessTaskFile(parameters, engineState);
+                    ExecuteTaskFile(parameters, engineState);
                 }
             }
         }
 
-        private void ProcessTaskFile(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ExecuteTaskFile(Dictionary<String, String> parameters, RuleEngineState engineState)
         {
             if (parameters.ContainsKey("FileName") && File.Exists(Path.Combine(Directory.GetCurrentDirectory(), parameters["FileName"])))
             {
@@ -191,15 +191,15 @@ namespace RPA.Core
             }
         }
 
-        public void ProcessTaskFile(String ruleFileName)
+        public void ExecuteTaskFile(String taskFileName)
         {
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), ruleFileName)))
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), taskFileName)))
             {
                 Dictionary<String, String> parameters = new Dictionary<String, String>();
-                parameters.Add("FileName", ruleFileName);
+                parameters.Add("FileName", taskFileName);
                 try
                 {
-                    ProcessTaskFile(parameters, _engineState);
+                    ExecuteTaskFile(parameters, _engineState);
                 }
                 catch (Exception ex)
                 {

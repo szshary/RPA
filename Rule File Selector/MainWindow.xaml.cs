@@ -27,7 +27,7 @@ namespace Rule_File_Selector
             if (ruleFileDialog.ShowDialog() == true)
             {
                 RuleEngine ruleEngine = new RuleEngine(Path.GetDirectoryName(ruleFileDialog.FileName));
-                ruleEngine.ProcessTaskFile(ruleFileDialog.SafeFileName);
+                ruleEngine.ExecuteTaskFile(ruleFileDialog.SafeFileName);
             }
         }
     }
