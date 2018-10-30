@@ -15,7 +15,7 @@ namespace Rule_File_Selector
         {
             InitializeComponent();
 
-            var ruleFileDialog = new OpenFileDialog
+            OpenFileDialog ruleFileDialog = new OpenFileDialog
             {
                 Title = "Lütfen kural dosyasını seçiniz.",
                 DefaultExt = ".xml",
