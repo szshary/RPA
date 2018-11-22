@@ -7,12 +7,12 @@ using System.IO;
 
 namespace RPA.Core
 {
-    sealed public class ExcelRuleSet : RuleSetDecorator
+    sealed public class ExcelRuleSet : StatefulRuleSetDecorator
     {
         private Application _excelApplication;
         private Workbook _excelWorkbook;
 
-        public ExcelRuleSet(RuleSet _ruleSet) : base(_ruleSet)
+        public ExcelRuleSet(StatefulRuleSet statefulRuleSet) : base(statefulRuleSet)
         {
             _elementStartRules.Add("ClearExcelRange", ClearExcelRange);
             _elementStartRules.Add("CopyExcelCellToExcelCell", CopyExcelCellToExcelCell);
@@ -37,7 +37,7 @@ namespace RPA.Core
             return false;
         }
 
-        private void ClearExcelRange(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ClearExcelRange(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("TargetWorksheet") && CheckWorksheetExists(parameters["TargetWorksheet"])
                 && (parameters.ContainsKey("StartRow") ^ parameters.ContainsKey("StartRowVariable"))
@@ -53,7 +53,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["StartRowVariable"]].ToString(), out startRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["StartRowVariable"]].ToString(), out startRow);
                 }
                 if (parameters.ContainsKey("StartColumn"))
                 {
@@ -61,7 +61,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["StartColumnVariable"]].ToString(), out startColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["StartColumnVariable"]].ToString(), out startColumn);
                 }
                 if (parameters.ContainsKey("EndRow"))
                 {
@@ -69,7 +69,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["EndRowVariable"]].ToString(), out endRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["EndRowVariable"]].ToString(), out endRow);
                 }
                 if (parameters.ContainsKey("EndColumn"))
                 {
@@ -77,7 +77,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["EndColumnVariable"]].ToString(), out endColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["EndColumnVariable"]].ToString(), out endColumn);
                 }
                 if (startRow != 0 && startColumn != 0 && endRow != 0 && endColumn != 0)
                 {
@@ -87,7 +87,7 @@ namespace RPA.Core
             }
         }
 
-        private void CopyExcelCellToExcelCell(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CopyExcelCellToExcelCell(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("SourceWorksheet") && parameters.ContainsKey("TargetWorksheet")
                 && (parameters.ContainsKey("SourceRow") ^ parameters.ContainsKey("SourceRowVariable"))
@@ -103,7 +103,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
                 }
                 if (parameters.ContainsKey("SourceColumn"))
                 {
@@ -111,7 +111,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
                 }
                 if (parameters.ContainsKey("TargetRow"))
                 {
@@ -119,7 +119,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
                 }
                 if (parameters.ContainsKey("TargetColumn"))
                 {
@@ -127,7 +127,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
                 }
                 if (sourceRow != 0 && sourceColumn != 0 && targetRow != 0 && targetColumn != 0)
                 {
@@ -136,24 +136,24 @@ namespace RPA.Core
             }
         }
 
-        private void StoreUsedRangeRowCountToVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreUsedRangeRowCountToVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
             {
                 Range excelRange = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].UsedRange;
 
-                if (engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                if (EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                 {
-                    engineState.VariableCollection[parameters["Variable"]] = excelRange.Rows.Count;
+                    EngineState.VariableCollection[parameters["Variable"]] = excelRange.Rows.Count;
                 }
                 else
                 {
-                    engineState.VariableCollection.Add(parameters["Variable"], excelRange.Rows.Count);
+                    EngineState.VariableCollection.Add(parameters["Variable"], excelRange.Rows.Count);
                 }
             }
         }
 
-        private void StoreExcelCellToVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreExcelCellToVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
             {
@@ -165,7 +165,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["SourceRowVariable"]].ToString(), out sourceRow);
                 }
                 if (parameters.ContainsKey("SourceColumn"))
                 {
@@ -173,23 +173,23 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["SourceColumnVariable"]].ToString(), out sourceColumn);
                 }
                 if (sourceColumn != 0 && sourceColumn != 0)
                 {
-                    if (engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                    if (EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                     {
-                        engineState.VariableCollection[parameters["Variable"]] = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value;
+                        EngineState.VariableCollection[parameters["Variable"]] = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value;
                     }
                     else
                     {
-                        engineState.VariableCollection.Add(parameters["Variable"], _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value);
+                        EngineState.VariableCollection.Add(parameters["Variable"], _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Cells[sourceRow, sourceColumn].Value);
                     }
                 }
             }
         }
 
-        private void StoreExcelRangeToTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreExcelRangeToTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
             {
@@ -212,20 +212,20 @@ namespace RPA.Core
                         }
                         table.Rows.Add(row);
                     }
-                    if (engineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
+                    if (EngineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
                     {
-                        engineState.TableCollection.Remove(engineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
+                        EngineState.TableCollection.Remove(EngineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
                     }
                     table.TableName = parameters["Table"];
-                    engineState.TableCollection.Add(table);
+                    EngineState.TableCollection.Add(table);
                 }
             }
         }
 
-        private void WriteToExcelCell(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void WriteToExcelCell(Dictionary<String, String> parameters)
         {
-            if ((parameters.ContainsKey("Value") ^ (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
-                ^ (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); })))
+            if ((parameters.ContainsKey("Value") ^ (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                ^ (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); })))
                 && parameters.ContainsKey("TargetWorksheet") && CheckWorksheetExists(parameters["TargetWorksheet"])
                 && (parameters.ContainsKey("TargetRow") ^ parameters.ContainsKey("TargetRowVariable"))
                 && (parameters.ContainsKey("TargetColumn") ^ parameters.ContainsKey("TargetColumnVariable")))
@@ -238,7 +238,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["TargetRowVariable"]].ToString(), out targetRow);
                 }
                 if (parameters.ContainsKey("TargetColumn"))
                 {
@@ -246,7 +246,7 @@ namespace RPA.Core
                 }
                 else
                 {
-                    Int32.TryParse(engineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
+                    Int32.TryParse(EngineState.VariableCollection[parameters["TargetColumnVariable"]].ToString(), out targetColumn);
                 }
                 if (targetRow != 0 && targetColumn != 0)
                 {
@@ -256,11 +256,11 @@ namespace RPA.Core
                     }
                     else if (parameters.ContainsKey("Variable"))
                     {
-                        _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = engineState.VariableCollection[parameters["Variable"]];
+                        _excelWorkbook.Sheets[parameters["TargetWorksheet"]].Cells[targetRow, targetColumn].Value = EngineState.VariableCollection[parameters["Variable"]];
                     }
                     else
                     {
-                        System.Data.DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                        System.Data.DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
 
                         for (int i = 0; i < table.Rows.Count; i++)
                         {
@@ -274,7 +274,7 @@ namespace RPA.Core
             }
         }
 
-        private void StartExcelSession(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StartExcelSession(Dictionary<String, String> parameters)
         {
             Process[] orphanExcelProcesses = Process.GetProcessesByName("EXCEL");
             foreach (Process orphanProcess in orphanExcelProcesses)
@@ -301,7 +301,7 @@ namespace RPA.Core
             }
         }
 
-        private void EndExcelSession(RuleEngineState engineState)
+        private void EndExcelSession()
         {
             if (_excelApplication != null)
             {

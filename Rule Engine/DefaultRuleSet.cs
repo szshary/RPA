@@ -6,9 +6,9 @@ using System.Text;
 
 namespace RPA.Core
 {
-    public class DefaultRuleSet : RuleSet
+    public class DefaultRuleSet : StatefulRuleSet
     {
-        public DefaultRuleSet()
+        public DefaultRuleSet() : base()
         {
             _elementStartRules.Add("AddColumnToTable", AddColumnToTable);
             _elementStartRules.Add("ClearTable", ClearTable);
@@ -32,29 +32,29 @@ namespace RPA.Core
             _elementEndRules.Add("CompareVariableWithVariable", PopConditionalStack);
         }
 
-        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters, RuleEngineState engineState)
+        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters)
         {
             if (_elementStartRules.ContainsKey(actionName))
             {
-                _elementStartRules[actionName](parameters, engineState);
+                _elementStartRules[actionName](parameters);
             }
         }
 
-        override public void ExecuteElementEndRule(String actionName, RuleEngineState engineState)
+        override public void ExecuteElementEndRule(String actionName)
         {
             if (_elementEndRules.ContainsKey(actionName))
             {
-                _elementEndRules[actionName](engineState);
+                _elementEndRules[actionName]();
             }
         }
 
-        private void AddColumnToTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddColumnToTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table") && parameters.ContainsKey("Column"))
             {
-                if (engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+                if (EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
                 {
-                    DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                    DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                     if (!table.Columns.Contains(parameters["Column"]))
                     {
                         DataColumn dc = new DataColumn
@@ -71,68 +71,68 @@ namespace RPA.Core
             }
         }
 
-        private void ClearTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ClearTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table"))
             {
-                if (engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+                if (EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
                 {
-                    engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }).Clear();
+                    EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }).Clear();
                 }
             }
         }
 
-        private void CompareVariableWithValue(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareVariableWithValue(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Variable") && parameters.ContainsKey("Value") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+            if (parameters.ContainsKey("Variable") && parameters.ContainsKey("Value") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
             {
-                engineState.ConditionalStack.Push(parameters["Value"].Equals(engineState.VariableCollection[parameters["Variable"]].ToString()));
+                EngineState.ConditionalStack.Push(parameters["Value"].Equals(EngineState.VariableCollection[parameters["Variable"]].ToString()));
             }
         }
 
-        private void CompareVariableWithVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareVariableWithVariable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Variable") && parameters["SecondVariable"] != null && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && engineState.VariableCollection.ContainsKey(parameters["SecondVariable"]))
+            if (parameters.ContainsKey("Variable") && parameters["SecondVariable"] != null && EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && EngineState.VariableCollection.ContainsKey(parameters["SecondVariable"]))
             {
-                engineState.ConditionalStack.Push(engineState.VariableCollection[parameters["Variable"]].ToString().Equals(engineState.VariableCollection[parameters["SecondVariable"]]));
+                EngineState.ConditionalStack.Push(EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(EngineState.VariableCollection[parameters["SecondVariable"]]));
             }
         }
 
-        private void CreateTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CreateTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table"))
             {
-                if (!engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+                if (!EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
                 {
                     DataTable table = new DataTable
                     {
                         TableName = parameters["Table"]
                     };
-                    engineState.TableCollection.Add(table);
+                    EngineState.TableCollection.Add(table);
                 }
             }
         }
 
-        private void ExtractVariablesFromTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ExtractVariablesFromTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("SelectQuery") && parameters.ContainsKey("ParameterVariables") && parameters.ContainsKey("SingleOutputTextFormat") && parameters.ContainsKey("OutputVariable"))
+            if (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("SelectQuery") && parameters.ContainsKey("ParameterVariables") && parameters.ContainsKey("SingleOutputTextFormat") && parameters.ContainsKey("OutputVariable"))
             {
-                if (!engineState.VariableCollection.ContainsKey(parameters["OutputVariable"]))
+                if (!EngineState.VariableCollection.ContainsKey(parameters["OutputVariable"]))
                 {
-                    engineState.VariableCollection.Add(parameters["OutputVariable"], String.Empty);
+                    EngineState.VariableCollection.Add(parameters["OutputVariable"], String.Empty);
                 }
-                if (parameters.ContainsKey("CountVariable") && !engineState.VariableCollection.ContainsKey(parameters["CountVariable"]))
+                if (parameters.ContainsKey("CountVariable") && !EngineState.VariableCollection.ContainsKey(parameters["CountVariable"]))
                 {
-                    engineState.VariableCollection.Add(parameters["CountVariable"], "0");
+                    EngineState.VariableCollection.Add(parameters["CountVariable"], "0");
                 }
 
-                DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                 List<Object> parameterVariables = new List<Object>();
                 foreach (String str in parameters["ParameterVariables"].Split(','))
                 {
-                    if (engineState.VariableCollection.ContainsKey(str))
+                    if (EngineState.VariableCollection.ContainsKey(str))
                     {
-                        parameterVariables.Add(engineState.VariableCollection[str]);
+                        parameterVariables.Add(EngineState.VariableCollection[str]);
                     }
                 }
 
@@ -174,19 +174,19 @@ namespace RPA.Core
                     strBld.AppendFormat(parameters["SingleOutputTextFormat"], columnsValues.Count == 0 ? foundRows[0].ItemArray : columnsValues.ToArray<Object>());
                 }
 
-                engineState.VariableCollection[parameters["OutputVariable"]] = strBld.ToString();
+                EngineState.VariableCollection[parameters["OutputVariable"]] = strBld.ToString();
                 if (parameters.ContainsKey("CountVariable"))
                 {
-                    engineState.VariableCollection[parameters["CountVariable"]] = foundRows.Length;
+                    EngineState.VariableCollection[parameters["CountVariable"]] = foundRows.Length;
                 }
             }
         }
 
-        private void LookUpTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void LookUpTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("PrimaryKeyVariables") && parameters.ContainsKey("RetrieveColumns") && parameters.ContainsKey("StoreAtVariables"))
+            if (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("PrimaryKeyVariables") && parameters.ContainsKey("RetrieveColumns") && parameters.ContainsKey("StoreAtVariables"))
             {
-                DataTable table = (engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }));
+                DataTable table = (EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }));
 
                 String[] primaryKeyVariablesStr = parameters["PrimaryKeyVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 String[] retrieveColumnsStr = parameters["RetrieveColumns"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -199,7 +199,7 @@ namespace RPA.Core
 
                     foreach (String str in primaryKeyVariablesStr)
                     {
-                        if (!engineState.VariableCollection.ContainsKey(str))
+                        if (!EngineState.VariableCollection.ContainsKey(str))
                         {
                             doAllVariablesExist = false;
                             break;
@@ -217,23 +217,23 @@ namespace RPA.Core
                     {
                         foreach (String str in storeAtVariablesStr)
                         {
-                            if (!engineState.VariableCollection.ContainsKey(str))
+                            if (!EngineState.VariableCollection.ContainsKey(str))
                             {
-                                engineState.VariableCollection.Add(str, null);
+                                EngineState.VariableCollection.Add(str, null);
                             }
                         }
                         Object[] keys = new Object[table.PrimaryKey.Length];
 
                         for (int i = 0; i < table.PrimaryKey.Length; i++)
                         {
-                            keys[i] = engineState.VariableCollection[primaryKeyVariablesStr[i]];
+                            keys[i] = EngineState.VariableCollection[primaryKeyVariablesStr[i]];
                         }
                         DataRow dr = table.Rows.Find(keys);
                         if (dr != null)
                         {
                             for (int i = 0; i < retrieveColumnsStr.Length; i++)
                             {
-                                engineState.VariableCollection[storeAtVariablesStr[i]] = dr.ItemArray[table.Columns[retrieveColumnsStr[i]].Ordinal];
+                                EngineState.VariableCollection[storeAtVariablesStr[i]] = dr.ItemArray[table.Columns[retrieveColumnsStr[i]].Ordinal];
                             }
                         }
                     }
@@ -241,7 +241,7 @@ namespace RPA.Core
             }
         }
 
-        private void LogEvent(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void LogEvent(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Format"))
             {
@@ -253,9 +253,9 @@ namespace RPA.Core
 
                     for (int i = 0; i < variables.Length; i++)
                     {
-                        if (engineState.VariableCollection.ContainsKey(variables[i]))
+                        if (EngineState.VariableCollection.ContainsKey(variables[i]))
                         {
-                            variables[i] = engineState.VariableCollection[variables[i]].ToString();
+                            variables[i] = EngineState.VariableCollection[variables[i]].ToString();
                         }
                         else
                         {
@@ -270,15 +270,15 @@ namespace RPA.Core
             }
         }
 
-        private void MoveVariablesToTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void MoveVariablesToTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+            if (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
             {
-                System.Data.DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                System.Data.DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                 DataRow dataRow = table.NewRow();
                 bool willBeInserted = true;
 
-                foreach (KeyValuePair<String, Object> keyPair in engineState.VariableCollection)
+                foreach (KeyValuePair<String, Object> keyPair in EngineState.VariableCollection)
                 {
                     if (dataRow.Table.Columns.Contains(keyPair.Key))
                     {
@@ -327,29 +327,29 @@ namespace RPA.Core
             }
         }
 
-        private void RemoveAllVariables(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void RemoveAllVariables(Dictionary<String, String> parameters)
         {
-            engineState.VariableCollection.Clear();
+            EngineState.VariableCollection.Clear();
         }
 
-        private void RemoveVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void RemoveVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("Value"))
             {
-                if (engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                if (EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                 {
-                    engineState.VariableCollection.Remove(parameters["Variable"]);
+                    EngineState.VariableCollection.Remove(parameters["Variable"]);
                 }
             }
         }
 
-        private void RemoveColumnFromTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void RemoveColumnFromTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table") && parameters.ContainsKey("Column"))
             {
-                if (engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+                if (EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
                 {
-                    DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                    DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                     if (table.Columns.Contains(parameters["Column"]))
                     {
                         table.Columns.Remove(parameters["Column"]);
@@ -358,28 +358,28 @@ namespace RPA.Core
             }
         }
 
-        private void RemoveTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void RemoveTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table"))
             {
-                if (engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+                if (EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
                 {
-                    engineState.TableCollection.Remove(engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }));
+                    EngineState.TableCollection.Remove(EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }));
                 }
             }
         }
 
-        private void SetColumnInTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void SetColumnInTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("Column") && parameters.ContainsKey("Value") && parameters.ContainsKey("SelectQuery") && parameters.ContainsKey("ParameterVariables"))
+            if (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("Column") && parameters.ContainsKey("Value") && parameters.ContainsKey("SelectQuery") && parameters.ContainsKey("ParameterVariables"))
             {
-                DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                 List<Object> criteria = new List<Object>();
                 foreach (String str in parameters["ParameterVariables"].Split(','))
                 {
-                    if (engineState.VariableCollection.ContainsKey(str))
+                    if (EngineState.VariableCollection.ContainsKey(str))
                     {
-                        criteria.Add(engineState.VariableCollection[str]);
+                        criteria.Add(EngineState.VariableCollection[str]);
                     }
                 }
                 DataRow[] foundRows = table.Select(String.Format(parameters["SelectQuery"], criteria.ToArray<Object>()));
@@ -390,11 +390,11 @@ namespace RPA.Core
             }
         }
 
-        private void SetPrimaryKeyOfTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void SetPrimaryKeyOfTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("UniqueConstraintColumns"))
+            if (parameters.ContainsKey("Table") && EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }) && parameters.ContainsKey("UniqueConstraintColumns"))
             {
-                DataTable table = engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
+                DataTable table = EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); });
                 String[] columnsStr = parameters["UniqueConstraintColumns"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 List<DataColumn> constraintColumns = new List<DataColumn>();
                 bool doAllColumnsExistIntheTable = true;
@@ -418,67 +418,67 @@ namespace RPA.Core
             }
         }
 
-        private void SetVariable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void SetVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable"))
             {
                 if (parameters.ContainsKey("Value"))
                 {
-                    if (engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                    if (EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                     {
-                        engineState.VariableCollection[parameters["Variable"]] = parameters["Value"];
+                        EngineState.VariableCollection[parameters["Variable"]] = parameters["Value"];
                     }
                     else
                     {
-                        engineState.VariableCollection.Add(parameters["Variable"], parameters["Value"]);
+                        EngineState.VariableCollection.Add(parameters["Variable"], parameters["Value"]);
                     }
                 }
-                else if (parameters.ContainsKey("ConcatenateText") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                else if (parameters.ContainsKey("ConcatenateText") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                 {
-                    engineState.VariableCollection[parameters["Variable"]] += parameters["ConcatenateText"];
+                    EngineState.VariableCollection[parameters["Variable"]] += parameters["ConcatenateText"];
                 }
-                else if (parameters.ContainsKey("ConcatenateVariable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && engineState.VariableCollection.ContainsKey(parameters["ConcatenateVariable"]))
+                else if (parameters.ContainsKey("ConcatenateVariable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && EngineState.VariableCollection.ContainsKey(parameters["ConcatenateVariable"]))
                 {
-                    engineState.VariableCollection[parameters["Variable"]] += engineState.VariableCollection[parameters["ConcatenateVariable"]].ToString();
+                    EngineState.VariableCollection[parameters["Variable"]] += EngineState.VariableCollection[parameters["ConcatenateVariable"]].ToString();
                 }
-                else if (parameters.ContainsKey("Increment") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && Int32.TryParse(parameters["Increment"], out int increment))
+                else if (parameters.ContainsKey("Increment") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && Int32.TryParse(parameters["Increment"], out int increment))
                 {
-                    engineState.VariableCollection[parameters["Variable"]] = Int32.Parse(engineState.VariableCollection[parameters["Variable"]].ToString()) + increment;
+                    EngineState.VariableCollection[parameters["Variable"]] = Int32.Parse(EngineState.VariableCollection[parameters["Variable"]].ToString()) + increment;
                 }
             }
         }
 
-        private void StoreExcelDateToVariables(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreExcelDateToVariables(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && parameters.ContainsKey("DayVariable") && parameters.ContainsKey("MonthVariable") && parameters.ContainsKey("YearVariable"))
+            if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && parameters.ContainsKey("DayVariable") && parameters.ContainsKey("MonthVariable") && parameters.ContainsKey("YearVariable"))
             {
-                if (Int64.TryParse(engineState.VariableCollection[parameters["Variable"]].ToString(), out long ticks))
+                if (Int64.TryParse(EngineState.VariableCollection[parameters["Variable"]].ToString(), out long ticks))
                 {
                     DateTime convertedDate = new DateTime(1899, 12, 30).AddDays(ticks); // 29.2.1900 Excel bug ı yüzünden 31 i değil 30 u
 
-                    if (!engineState.VariableCollection.ContainsKey(parameters["DayVariable"]))
+                    if (!EngineState.VariableCollection.ContainsKey(parameters["DayVariable"]))
                     {
-                        engineState.VariableCollection.Add(parameters["DayVariable"], convertedDate.Day.ToString());
+                        EngineState.VariableCollection.Add(parameters["DayVariable"], convertedDate.Day.ToString());
                     }
                     else
                     {
-                        engineState.VariableCollection[parameters["DayVariable"]] = convertedDate.Day.ToString();
+                        EngineState.VariableCollection[parameters["DayVariable"]] = convertedDate.Day.ToString();
                     }
-                    if (!engineState.VariableCollection.ContainsKey(parameters["MonthVariable"]))
+                    if (!EngineState.VariableCollection.ContainsKey(parameters["MonthVariable"]))
                     {
-                        engineState.VariableCollection.Add(parameters["MonthVariable"], convertedDate.Month.ToString());
-                    }
-                    else
-                    {
-                        engineState.VariableCollection[parameters["MonthVariable"]] = convertedDate.Month.ToString();
-                    }
-                    if (!engineState.VariableCollection.ContainsKey(parameters["YearVariable"]))
-                    {
-                        engineState.VariableCollection.Add(parameters["YearVariable"], convertedDate.Year.ToString());
+                        EngineState.VariableCollection.Add(parameters["MonthVariable"], convertedDate.Month.ToString());
                     }
                     else
                     {
-                        engineState.VariableCollection[parameters["YearVariable"]] = convertedDate.Year.ToString();
+                        EngineState.VariableCollection[parameters["MonthVariable"]] = convertedDate.Month.ToString();
+                    }
+                    if (!EngineState.VariableCollection.ContainsKey(parameters["YearVariable"]))
+                    {
+                        EngineState.VariableCollection.Add(parameters["YearVariable"], convertedDate.Year.ToString());
+                    }
+                    else
+                    {
+                        EngineState.VariableCollection[parameters["YearVariable"]] = convertedDate.Year.ToString();
                     }
                 }
             }

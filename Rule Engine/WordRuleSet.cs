@@ -6,13 +6,13 @@ using System.IO;
 
 namespace RPA.Core
 {
-    sealed internal class WordRuleSet : RuleSetDecorator
+    sealed internal class WordRuleSet : StatefulRuleSetDecorator
     {
         private SortedDictionary<String, ContentControl> documentTextContentControls;
         private Application wordApplication;
         private Document wordDocument;
 
-        public WordRuleSet(RuleSet _ruleSet) : base(_ruleSet)
+        public WordRuleSet(StatefulRuleSet statefulRuleSet) : base(statefulRuleSet)
         {
             _elementStartRules.Add("FillPlainTextContentControl", FillPlainTextContentControl);
             _elementStartRules.Add("SaveDocumentAsNewFile", SaveDocumentAsNewFile);
@@ -21,7 +21,7 @@ namespace RPA.Core
             _elementEndRules.Add("WordSession", EndWordSession);
         }
 
-        private void FillPlainTextContentControl(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void FillPlainTextContentControl(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Tag") && documentTextContentControls.ContainsKey(parameters["Tag"]))
             {
@@ -29,21 +29,21 @@ namespace RPA.Core
                 {
                     documentTextContentControls[parameters["Tag"]].Range.Text = parameters["Value"];
                 }
-                else if (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                else if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                 {
-                    documentTextContentControls[parameters["Tag"]].Range.Text = engineState.VariableCollection[parameters["Variable"]].ToString();
+                    documentTextContentControls[parameters["Tag"]].Range.Text = EngineState.VariableCollection[parameters["Variable"]].ToString();
                 }
             }
         }
 
-        private void SaveDocumentAsNewFile(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void SaveDocumentAsNewFile(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("FileName"))
             {
                 String fileName = parameters["FileName"];
-                if (parameters.ContainsKey("SuffixVariable") && engineState.VariableCollection.ContainsKey(parameters["SuffixVariable"]))
+                if (parameters.ContainsKey("SuffixVariable") && EngineState.VariableCollection.ContainsKey(parameters["SuffixVariable"]))
                 {
-                    fileName += engineState.VariableCollection[parameters["SuffixVariable"]].ToString();
+                    fileName += EngineState.VariableCollection[parameters["SuffixVariable"]].ToString();
                 }
                 fileName += ".docx";
                 Object useDefaultValue = Type.Missing;
@@ -54,7 +54,7 @@ namespace RPA.Core
             }
         }
 
-        private void StartWordSession(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StartWordSession(Dictionary<String, String> parameters)
         {
             Process[] orphanWordProcesses = Process.GetProcessesByName("WORD");
             foreach (Process orphanProcess in orphanWordProcesses)
@@ -106,7 +106,7 @@ namespace RPA.Core
             }
         }
 
-        private void EndWordSession(RuleEngineState engineState)
+        private void EndWordSession()
         {
             if (wordApplication != null)
             {

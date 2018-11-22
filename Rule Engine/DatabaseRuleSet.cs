@@ -7,11 +7,11 @@ using System.Text.RegularExpressions;
 
 namespace RPA.Core
 {
-    sealed public class DatabaseRuleSet : RuleSetDecorator
+    sealed public class DatabaseRuleSet : StatefulRuleSetDecorator
     {
         private iDB2Connection _dB2connection;
 
-        public DatabaseRuleSet(RuleSet _ruleSet) : base(_ruleSet)
+        public DatabaseRuleSet(StatefulRuleSet statefulRuleSet) : base(statefulRuleSet)
         {
             _elementStartRules.Add("StoreQueryResultToVariables", StoreQueryResultToVariables);
             _elementStartRules.Add("StoreQueryResultToTable", StoreQueryResultToTable);
@@ -23,7 +23,7 @@ namespace RPA.Core
             _elementEndRules.Add("DatabaseSession", EndDatabaseSession);
         }
 
-        private void CompareValueWithScalarQuery(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareValueWithScalarQuery(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Value") && parameters.ContainsKey("SelectQuery"))
             {
@@ -33,15 +33,15 @@ namespace RPA.Core
                     {
                         foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                         {
-                            if (engineState.VariableCollection.ContainsKey(str))
+                            if (EngineState.VariableCollection.ContainsKey(str))
                             {
-                                command.Parameters.AddWithValue(str, engineState.VariableCollection[str]);
+                                command.Parameters.AddWithValue(str, EngineState.VariableCollection[str]);
                             }
                         }
                     }
                     try
                     {
-                        engineState.ConditionalStack.Push(parameters["Value"].Equals(command.ExecuteScalar().ToString()));
+                        EngineState.ConditionalStack.Push(parameters["Value"].Equals(command.ExecuteScalar().ToString()));
                     }
                     catch (Exception ex)
                     {
@@ -50,7 +50,7 @@ namespace RPA.Core
             }
         }
 
-        private void StoreQueryResultToTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreQueryResultToTable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Table"))
             {
@@ -64,15 +64,15 @@ namespace RPA.Core
                             Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                             foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                             {
-                                if (engineState.VariableCollection.ContainsKey(str))
+                                if (EngineState.VariableCollection.ContainsKey(str))
                                 {
-                                    if (numberRegex.IsMatch(engineState.VariableCollection[str].ToString()))
+                                    if (numberRegex.IsMatch(EngineState.VariableCollection[str].ToString()))
                                     {
-                                        command.Parameters.AddWithValue(str, engineState.VariableCollection[str].ToString());
+                                        command.Parameters.AddWithValue(str, EngineState.VariableCollection[str].ToString());
                                     }
                                     else
                                     {
-                                        command.Parameters.AddWithValue(str, String.Format("'{0}'", engineState.VariableCollection[str].ToString()));
+                                        command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableCollection[str].ToString()));
                                     }
                                 }
                             }
@@ -81,18 +81,18 @@ namespace RPA.Core
                         {
                             table.Load(reader);
                         }
-                        if (engineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
+                        if (EngineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
                         {
-                            engineState.TableCollection.Remove(engineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
+                            EngineState.TableCollection.Remove(EngineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
                         }
                         table.TableName = parameters["Table"];
-                        engineState.TableCollection.Add(table);
+                        EngineState.TableCollection.Add(table);
                     }
                 }
             }
         }
 
-        private void StoreQueryResultToVariables(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StoreQueryResultToVariables(Dictionary<String, String> parameters)
         {
             using (iDB2Command command = new iDB2Command(parameters["SelectQuery"], _dB2connection))
             {
@@ -102,15 +102,15 @@ namespace RPA.Core
                     Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                     foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        if (engineState.VariableCollection.ContainsKey(str))
+                        if (EngineState.VariableCollection.ContainsKey(str))
                         {
-                            if (numberRegex.IsMatch(engineState.VariableCollection[str].ToString()))
+                            if (numberRegex.IsMatch(EngineState.VariableCollection[str].ToString()))
                             {
-                                command.Parameters.AddWithValue(str, engineState.VariableCollection[str].ToString());
+                                command.Parameters.AddWithValue(str, EngineState.VariableCollection[str].ToString());
                             }
                             else
                             {
-                                command.Parameters.AddWithValue(str, String.Format("'{0}'", engineState.VariableCollection[str].ToString()));
+                                command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableCollection[str].ToString()));
                             }
                         }
                     }
@@ -121,13 +121,13 @@ namespace RPA.Core
                     {
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            if (engineState.VariableCollection.ContainsKey(reader.GetName(i)))
+                            if (EngineState.VariableCollection.ContainsKey(reader.GetName(i)))
                             {
-                                engineState.VariableCollection[reader.GetName(i)] = reader[i];
+                                EngineState.VariableCollection[reader.GetName(i)] = reader[i];
                             }
                             else
                             {
-                                engineState.VariableCollection.Add(reader.GetName(i), reader[i]);
+                                EngineState.VariableCollection.Add(reader.GetName(i), reader[i]);
                             }
                         }
                     }
@@ -135,7 +135,7 @@ namespace RPA.Core
             }
         }
 
-        private void StartDatabaseSession(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StartDatabaseSession(Dictionary<String, String> parameters)
         {
             if ((_dB2connection == null || _dB2connection.State == ConnectionState.Closed))
             {
@@ -155,7 +155,7 @@ namespace RPA.Core
             }
         }
 
-        private void EndDatabaseSession(RuleEngineState engineState)
+        private void EndDatabaseSession()
         {
             if (_dB2connection != null && _dB2connection.State == ConnectionState.Open)
             {

@@ -5,54 +5,68 @@ namespace RPA.Core
 {
     abstract public class RuleSet
     {
-        protected readonly Dictionary<String, Action<Dictionary<String, String>, RuleEngineState>> _elementStartRules;
-        protected readonly Dictionary<String, Action<RuleEngineState>> _elementEndRules;
+        protected readonly Dictionary<String, Action<Dictionary<String, String>>> _elementStartRules;
+        protected readonly Dictionary<String, Action> _elementEndRules;
+
+        abstract public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters);
+        abstract public void ExecuteElementEndRule(String actionName);
 
         protected RuleSet()
-        {
-            _elementStartRules = new Dictionary<String, Action<Dictionary<String, String>, RuleEngineState>>();
-            _elementEndRules = new Dictionary<String, Action<RuleEngineState>>();
-        }
-
-        abstract public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters, RuleEngineState engineState);
-        abstract public void ExecuteElementEndRule(String actionName, RuleEngineState engineState);
-
-        protected void PopConditionalStack(RuleEngineState engineState)
-        {
-            engineState.ConditionalStack.Pop();
+        {   
+            _elementStartRules = new Dictionary<String, Action<Dictionary<String, String>>>();
+            _elementEndRules = new Dictionary<String, Action>();
         }
     }
 
-    abstract public class RuleSetDecorator : RuleSet
+    abstract public class StatefulRuleSet : RuleSet
     {
-        protected RuleSet _decoratedRuleSet;
-
-        protected RuleSetDecorator(RuleSet decoratedRuleSet) : base()
+        public readonly RuleEngineState EngineState;
+        
+        protected StatefulRuleSet() : base()
         {
-            _decoratedRuleSet = decoratedRuleSet;
+            EngineState = new RuleEngineState();
         }
 
-        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters, RuleEngineState engineState)
+        protected StatefulRuleSet(RuleEngineState engineState) : base()
+        {
+            EngineState = engineState;
+        }
+
+        protected void PopConditionalStack()
+        {
+            EngineState.ConditionalStack.Pop();
+        }
+    }
+
+    abstract public class StatefulRuleSetDecorator : StatefulRuleSet
+    {
+        protected StatefulRuleSet _decoratedStatefulRuleSet;
+
+        protected StatefulRuleSetDecorator(StatefulRuleSet decoratedRuleSet) : base(decoratedRuleSet.EngineState)
+        {
+            _decoratedStatefulRuleSet = decoratedRuleSet;
+        }
+        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters)
         {
             if (_elementStartRules.ContainsKey(actionName))
             {
-                _elementStartRules[actionName](parameters, engineState);
+                _elementStartRules[actionName](parameters);
             }
             else
             {
-                _decoratedRuleSet.ExecuteElementStartRule(actionName, parameters, engineState);
+                _decoratedStatefulRuleSet.ExecuteElementStartRule(actionName, parameters);
             }
         }
 
-        override public void ExecuteElementEndRule(String actionName, RuleEngineState engineState)
+        override public void ExecuteElementEndRule(String actionName)
         {
             if (_elementEndRules.ContainsKey(actionName))
             {
-                _elementEndRules[actionName](engineState);
+                _elementEndRules[actionName]();
             }
             else
             {
-                _decoratedRuleSet.ExecuteElementEndRule(actionName, engineState);
+                _decoratedStatefulRuleSet.ExecuteElementEndRule(actionName);
             }
         }
     }

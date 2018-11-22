@@ -4,7 +4,7 @@
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
       <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
-      <LoopUntilEqualityAchieved Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Long_Term_Loop.xml"/>
+      <LoopUntilEqual Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Long_Term_Loop.xml"/>
     </ExcelSession>
   </Optional>
   <Optional Name="Process_Prepayment">
@@ -12,7 +12,7 @@
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
       <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
-      <LoopUntilEqualityAchieved Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Prepayment_Loop.xml"/>
+      <LoopUntilEqual Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Prepayment_Loop.xml"/>
     </ExcelSession>
   </Optional>
 </Task>

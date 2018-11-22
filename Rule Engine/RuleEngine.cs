@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 
@@ -10,17 +11,15 @@ namespace RPA.Core
     sealed public class RuleEngine : RuleSet
     {
         //private Stopwatch _stopWatch;
-        private RuleEngineState _engineState;
-        private Stack<RuleSet> _activeRuleSets;
+        private Stack<StatefulRuleSet> _activeRuleSets;
 
         public RuleEngine(String ruleFilePath) : base()
         {
             Directory.SetCurrentDirectory(ruleFilePath);
-            _engineState = new RuleEngineState();
-            _activeRuleSets = new Stack<RuleSet>();
+            _activeRuleSets = new Stack<StatefulRuleSet>();
             _activeRuleSets.Push(new DefaultRuleSet());
 
-            _elementStartRules.Add("LoopUntilEqualityAchieved", LoopUntilEqualityAchieved);
+            _elementStartRules.Add("LoopUntilEqual", LoopUntilEqual);
             _elementStartRules.Add("LoopThroughTable", LoopThroughTable);
             _elementStartRules.Add("ExecuteTaskFile", ExecuteTaskFile);
 
@@ -36,94 +35,94 @@ namespace RPA.Core
             _elementEndRules.Add("WordSession", ShrinkRuleSet);
         }
 
-        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters, RuleEngineState engineState)
+        override public void ExecuteElementStartRule(String actionName, Dictionary<String, String> parameters)
         {
             if (_elementStartRules.ContainsKey(actionName))
             {
-                _elementStartRules[actionName](parameters, engineState);
+                _elementStartRules[actionName](parameters);
             }
-            _activeRuleSets.Peek().ExecuteElementStartRule(actionName, parameters, engineState);
+            _activeRuleSets.Peek().ExecuteElementStartRule(actionName, parameters);
         }
 
-        override public void ExecuteElementEndRule(String actionName, RuleEngineState engineState)
+        override public void ExecuteElementEndRule(String actionName)
         {
-            _activeRuleSets.Peek().ExecuteElementEndRule(actionName, engineState);
+            _activeRuleSets.Peek().ExecuteElementEndRule(actionName);
             if (_elementEndRules.ContainsKey(actionName))
             {
-                _elementEndRules[actionName](engineState);
+                _elementEndRules[actionName]();
             }
         }
 
-        private void AddBrowserRuleSet(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddBrowserRuleSet(Dictionary<String, String> parameters)
         {
             _activeRuleSets.Push(new BrowserRuleSet(_activeRuleSets.Peek()));
         }
 
-        private void AddDatabaseRuleSet(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddDatabaseRuleSet(Dictionary<String, String> parameters)
         {
             _activeRuleSets.Push(new DatabaseRuleSet(_activeRuleSets.Peek()));
         }
 
-        private void AddExcelRuleSet(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddExcelRuleSet(Dictionary<String, String> parameters)
         {
             _activeRuleSets.Push(new ExcelRuleSet(_activeRuleSets.Peek()));
         }
 
-        private void AddTN5250RuleSet(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddTN5250RuleSet(Dictionary<String, String> parameters)
         {
             _activeRuleSets.Push(new TN5250RuleSet(_activeRuleSets.Peek()));
         }
 
-        private void AddWordRuleSet(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AddWordRuleSet(Dictionary<String, String> parameters)
         {
             _activeRuleSets.Push(new WordRuleSet(_activeRuleSets.Peek()));
         }
 
-        private void ShrinkRuleSet(RuleEngineState engineState)
+        private void ShrinkRuleSet()
         {
             _activeRuleSets.Pop();
         }
 
-        private void LoopUntilEqualityAchieved(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void LoopUntilEqual(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && engineState.VariableCollection.ContainsKey(parameters["OtherVariable"]))))
+            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && _activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && _activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(parameters["OtherVariable"]))))
             {
                 if (parameters.ContainsKey("Value"))
                 {
-                    while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
+                    while (!_activeRuleSets.Peek().EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
                     {
-                        ExecuteTaskFile(parameters, engineState);
+                        ExecuteTaskFile(parameters);
                     }
                 }
                 else
                 {
-                    while (!engineState.VariableCollection[parameters["Variable"]].ToString().Equals(engineState.VariableCollection[parameters["OtherVariable"]].ToString()))
+                    while (!_activeRuleSets.Peek().EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(_activeRuleSets.Peek().EngineState.VariableCollection[parameters["OtherVariable"]].ToString()))
                     {
-                        ExecuteTaskFile(parameters, engineState);
+                        ExecuteTaskFile(parameters);
                     }
                 }
             }
         }
 
-        private void LoopThroughTable(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void LoopThroughTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Table") && engineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Table") && _activeRuleSets.Peek().EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
             {
-                foreach (DataRow dr in (engineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }).Rows))
+                foreach (DataRow dr in (_activeRuleSets.Peek().EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }).Rows))
                 {
                     foreach (DataColumn col in dr.Table.Columns)
                     {
-                        if (engineState.VariableCollection.ContainsKey(col.ColumnName))
+                        if (_activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(col.ColumnName))
                         {
-                            engineState.VariableCollection[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
+                            _activeRuleSets.Peek().EngineState.VariableCollection[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
                         }
                     }
-                    ExecuteTaskFile(parameters, engineState);
+                    ExecuteTaskFile(parameters);
                 }
             }
         }
 
-        private void ExecuteTaskFile(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ExecuteTaskFile(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("FileName") && File.Exists(Path.Combine(Directory.GetCurrentDirectory(), parameters["FileName"])))
             {
@@ -147,13 +146,13 @@ namespace RPA.Core
                                     switch (readerXML.Name)
                                     {
                                         case "True":
-                                            if (!engineState.ConditionalStack.Peek())
+                                            if (!_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
                                             {
                                                 readerXML.Skip();
                                             }
                                             break;
                                         case "False":
-                                            if (engineState.ConditionalStack.Peek())
+                                            if (_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
                                             {
                                                 readerXML.Skip();
                                             }
@@ -165,7 +164,7 @@ namespace RPA.Core
                                             }
                                             break;
                                         default:
-                                            ExecuteElementStartRule(readerXML.Name, actionParameters, engineState);
+                                            ExecuteElementStartRule(readerXML.Name, actionParameters);
                                             break;
                                     }
                                     break;
@@ -177,7 +176,7 @@ namespace RPA.Core
                                         case "Optional":
                                             break;
                                         default:
-                                            ExecuteElementEndRule(readerXML.Name, engineState);
+                                            ExecuteElementEndRule(readerXML.Name);
                                             break;
                                     }
                                     break;
@@ -193,17 +192,32 @@ namespace RPA.Core
 
         public void ExecuteTaskFile(String taskFileName)
         {
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), taskFileName)))
+            Dictionary<String, String> parameters = new Dictionary<String, String>();
+            parameters.Add("FileName", taskFileName);
+            try
             {
-                Dictionary<String, String> parameters = new Dictionary<String, String>();
-                parameters.Add("FileName", taskFileName);
-                try
+                ExecuteTaskFile(parameters);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        public void ExecuteConcurrently(String taskFileName, int threadCount)
+        {
+            Dictionary<String, String> parameters = new Dictionary<String, String>();
+            parameters.Add("FileName", taskFileName);
+            try
+            {
+                for(int i = 0; i < threadCount; i++)
                 {
-                    ExecuteTaskFile(parameters, _engineState);
+                    //Task.Factory.
+
                 }
-                catch (Exception ex)
-                {
-                }
+                ExecuteTaskFile(parameters);
+            }
+            catch (Exception ex)
+            {
             }
         }
     }

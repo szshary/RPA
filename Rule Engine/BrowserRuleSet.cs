@@ -9,14 +9,14 @@ using System.IO;
 
 namespace RPA.Core
 {
-    sealed public class BrowserRuleSet : RuleSetDecorator
+    sealed public class BrowserRuleSet : StatefulRuleSetDecorator
     {
         private IWebDriver _htmlDriver;
         private WebDriverWait _wait;
 
         private List<String> _frameNames;
 
-        public BrowserRuleSet(RuleSet _ruleSet) : base(_ruleSet)
+        public BrowserRuleSet(StatefulRuleSet statefulRuleSet) : base(statefulRuleSet)
         {
             Environment.SetEnvironmentVariable("webdriver.chrome.driver", Directory.GetCurrentDirectory() + "\\chromedriver.exe");
             Environment.SetEnvironmentVariable("webdriver.edge.driver", Directory.GetCurrentDirectory() + "\\MicrosoftWebDriver.exe");
@@ -46,7 +46,7 @@ namespace RPA.Core
             }
         }
 
-        private void AcceptAlert(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void AcceptAlert(Dictionary<String, String> parameters)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace RPA.Core
             }
         }
 
-        private void ClickBrowser(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void ClickBrowser(Dictionary<String, String> parameters)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace RPA.Core
             }
         }
 
-        private void CompareAnyElementOfClassforVisibility(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareAnyElementOfClassforVisibility(Dictionary<String, String> parameters)
         {
             bool isEqual = false;
             RefreshHtmlFrames(parameters);
@@ -100,28 +100,28 @@ namespace RPA.Core
                     break;
                 }
             }
-            engineState.ConditionalStack.Push(isEqual);
+            EngineState.ConditionalStack.Push(isEqual);
         }
 
-        private void CompareValueWithIdContent(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareValueWithIdContent(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Value") && parameters.ContainsKey("Id"))
             {
                 RefreshHtmlFrames(parameters);
-                engineState.ConditionalStack.Push(parameters["Value"].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
+                EngineState.ConditionalStack.Push(parameters["Value"].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
             }
         }
 
-        private void CompareVariableWithIdContent(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void CompareVariableWithIdContent(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("Id"))
             {
                 RefreshHtmlFrames(parameters);
-                engineState.ConditionalStack.Push(engineState.VariableCollection[parameters["Variable"]].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
+                EngineState.ConditionalStack.Push(EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
             }
         }
 
-        private void RefuseAlert(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void RefuseAlert(Dictionary<String, String> parameters)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace RPA.Core
             }
         }
 
-        private void SendTextToBrowser(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void SendTextToBrowser(Dictionary<String, String> parameters)
         {
             try
             {
@@ -159,9 +159,9 @@ namespace RPA.Core
                     {
                         targetElement.SendKeys(parameters["Value"]);
                     }
-                    else if (parameters.ContainsKey("Variable") && engineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                    else if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
                     {
-                        targetElement.SendKeys(engineState.VariableCollection[parameters["Variable"]].ToString());
+                        targetElement.SendKeys(EngineState.VariableCollection[parameters["Variable"]].ToString());
                     }
                 }
             }
@@ -170,7 +170,7 @@ namespace RPA.Core
             }
         }
 
-        private void WaitBrowser(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void WaitBrowser(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("ExpectedCondition"))
             {
@@ -226,7 +226,7 @@ namespace RPA.Core
             }
         }
 
-        private void StartBrowserSession(Dictionary<String, String> parameters, RuleEngineState engineState)
+        private void StartBrowserSession(Dictionary<String, String> parameters)
         {
             if (_htmlDriver == null)
             {
@@ -276,7 +276,7 @@ namespace RPA.Core
             }
         }
 
-        private void EndBrowserSession(RuleEngineState engineState)
+        private void EndBrowserSession()
         {
             if (_htmlDriver != null)
             {
