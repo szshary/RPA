@@ -6,14 +6,14 @@ namespace RPA.Core
 {
     public class RuleEngineState
     {
-        public List<DataTable> TableCollection;
-        public Dictionary<String, Object> VariableCollection;
+        public List<DataTable> TableList;
+        public Dictionary<String, Object> VariableDictionary;
         public Stack<bool> ConditionalStack;
 
         public RuleEngineState()
         {
-            TableCollection = new List<DataTable>();
-            VariableCollection = new Dictionary<String, Object>();
+            TableList = new List<DataTable>();
+            VariableDictionary = new Dictionary<String, Object>();
             ConditionalStack = new Stack<bool>();
         }
     }

@@ -29,9 +29,9 @@ namespace RPA.Core
                 {
                     documentTextContentControls[parameters["Tag"]].Range.Text = parameters["Value"];
                 }
-                else if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                else if (parameters.ContainsKey("Variable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
                 {
-                    documentTextContentControls[parameters["Tag"]].Range.Text = EngineState.VariableCollection[parameters["Variable"]].ToString();
+                    documentTextContentControls[parameters["Tag"]].Range.Text = EngineState.VariableDictionary[parameters["Variable"]].ToString();
                 }
             }
         }
@@ -41,9 +41,9 @@ namespace RPA.Core
             if (parameters.ContainsKey("FileName"))
             {
                 String fileName = parameters["FileName"];
-                if (parameters.ContainsKey("SuffixVariable") && EngineState.VariableCollection.ContainsKey(parameters["SuffixVariable"]))
+                if (parameters.ContainsKey("SuffixVariable") && EngineState.VariableDictionary.ContainsKey(parameters["SuffixVariable"]))
                 {
-                    fileName += EngineState.VariableCollection[parameters["SuffixVariable"]].ToString();
+                    fileName += EngineState.VariableDictionary[parameters["SuffixVariable"]].ToString();
                 }
                 fileName += ".docx";
                 Object useDefaultValue = Type.Missing;

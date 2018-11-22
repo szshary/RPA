@@ -106,9 +106,9 @@ namespace RPA.Core
 
         private void CompareVariableWithTN5250(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && parameters.ContainsKey("Left") && parameters.ContainsKey("Top") && parameters.ContainsKey("Length"))
+            if (parameters.ContainsKey("Variable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && parameters.ContainsKey("Left") && parameters.ContainsKey("Top") && parameters.ContainsKey("Length"))
             {
-                EngineState.ConditionalStack.Push(EngineState.VariableCollection[parameters["Variable"]].Equals(ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"]))));
+                EngineState.ConditionalStack.Push(EngineState.VariableDictionary[parameters["Variable"]].Equals(ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"]))));
             }
         }
 
@@ -275,13 +275,13 @@ namespace RPA.Core
         {
             if (parameters.ContainsKey("Left") && parameters.ContainsKey("Top") && parameters.ContainsKey("Length") && parameters.ContainsKey("Variable"))
             {
-                if (!EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                if (!EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
                 {
-                    EngineState.VariableCollection.Add(parameters["Variable"], ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"])));
+                    EngineState.VariableDictionary.Add(parameters["Variable"], ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"])));
                 }
                 else
                 {
-                    EngineState.VariableCollection[parameters["Variable"]] = ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"]));
+                    EngineState.VariableDictionary[parameters["Variable"]] = ScrapeFromTN5250(Convert.ToInt32(parameters["Left"]), Convert.ToInt32(parameters["Top"]), Convert.ToInt32(parameters["Length"]));
                 }
             }
         }
@@ -421,9 +421,9 @@ namespace RPA.Core
             {
                 WriteToTN5250(parameters["Value"], isSubmit, maxLengthOfField, waitDuration);
             }
-            else if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
+            else if (parameters.ContainsKey("Variable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
             {
-                WriteToTN5250(EngineState.VariableCollection[parameters["Variable"]].ToString(), isSubmit, maxLengthOfField, waitDuration);
+                WriteToTN5250(EngineState.VariableDictionary[parameters["Variable"]].ToString(), isSubmit, maxLengthOfField, waitDuration);
             }
         }
 

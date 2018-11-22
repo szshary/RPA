@@ -85,18 +85,18 @@ namespace RPA.Core
 
         private void LoopUntilEqual(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && _activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && _activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(parameters["OtherVariable"]))))
+            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["OtherVariable"]))))
             {
                 if (parameters.ContainsKey("Value"))
                 {
-                    while (!_activeRuleSets.Peek().EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(parameters["Value"]))
+                    while (!_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["Variable"]].ToString().Equals(parameters["Value"]))
                     {
                         ExecuteTaskFile(parameters);
                     }
                 }
                 else
                 {
-                    while (!_activeRuleSets.Peek().EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(_activeRuleSets.Peek().EngineState.VariableCollection[parameters["OtherVariable"]].ToString()))
+                    while (!_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["Variable"]].ToString().Equals(_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["OtherVariable"]].ToString()))
                     {
                         ExecuteTaskFile(parameters);
                     }
@@ -106,15 +106,15 @@ namespace RPA.Core
 
         private void LoopThroughTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Table") && _activeRuleSets.Peek().EngineState.TableCollection.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Table") && _activeRuleSets.Peek().EngineState.TableList.Exists((x) => { return (x.TableName == parameters["Table"]); }))
             {
-                foreach (DataRow dr in (_activeRuleSets.Peek().EngineState.TableCollection.Find((x) => { return (x.TableName == parameters["Table"]); }).Rows))
+                foreach (DataRow dr in (_activeRuleSets.Peek().EngineState.TableList.Find((x) => { return (x.TableName == parameters["Table"]); }).Rows))
                 {
                     foreach (DataColumn col in dr.Table.Columns)
                     {
-                        if (_activeRuleSets.Peek().EngineState.VariableCollection.ContainsKey(col.ColumnName))
+                        if (_activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(col.ColumnName))
                         {
-                            _activeRuleSets.Peek().EngineState.VariableCollection[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
+                            _activeRuleSets.Peek().EngineState.VariableDictionary[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
                         }
                     }
                     ExecuteTaskFile(parameters);

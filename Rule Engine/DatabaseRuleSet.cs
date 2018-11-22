@@ -33,9 +33,9 @@ namespace RPA.Core
                     {
                         foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                         {
-                            if (EngineState.VariableCollection.ContainsKey(str))
+                            if (EngineState.VariableDictionary.ContainsKey(str))
                             {
-                                command.Parameters.AddWithValue(str, EngineState.VariableCollection[str]);
+                                command.Parameters.AddWithValue(str, EngineState.VariableDictionary[str]);
                             }
                         }
                     }
@@ -64,15 +64,15 @@ namespace RPA.Core
                             Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                             foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                             {
-                                if (EngineState.VariableCollection.ContainsKey(str))
+                                if (EngineState.VariableDictionary.ContainsKey(str))
                                 {
-                                    if (numberRegex.IsMatch(EngineState.VariableCollection[str].ToString()))
+                                    if (numberRegex.IsMatch(EngineState.VariableDictionary[str].ToString()))
                                     {
-                                        command.Parameters.AddWithValue(str, EngineState.VariableCollection[str].ToString());
+                                        command.Parameters.AddWithValue(str, EngineState.VariableDictionary[str].ToString());
                                     }
                                     else
                                     {
-                                        command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableCollection[str].ToString()));
+                                        command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableDictionary[str].ToString()));
                                     }
                                 }
                             }
@@ -81,12 +81,12 @@ namespace RPA.Core
                         {
                             table.Load(reader);
                         }
-                        if (EngineState.TableCollection.Exists((x) => { return (x.TableName == table.TableName); }))
+                        if (EngineState.TableList.Exists((x) => { return (x.TableName == table.TableName); }))
                         {
-                            EngineState.TableCollection.Remove(EngineState.TableCollection.Find((x) => { return (x.TableName == table.TableName); }));
+                            EngineState.TableList.Remove(EngineState.TableList.Find((x) => { return (x.TableName == table.TableName); }));
                         }
                         table.TableName = parameters["Table"];
-                        EngineState.TableCollection.Add(table);
+                        EngineState.TableList.Add(table);
                     }
                 }
             }
@@ -102,15 +102,15 @@ namespace RPA.Core
                     Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                     foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        if (EngineState.VariableCollection.ContainsKey(str))
+                        if (EngineState.VariableDictionary.ContainsKey(str))
                         {
-                            if (numberRegex.IsMatch(EngineState.VariableCollection[str].ToString()))
+                            if (numberRegex.IsMatch(EngineState.VariableDictionary[str].ToString()))
                             {
-                                command.Parameters.AddWithValue(str, EngineState.VariableCollection[str].ToString());
+                                command.Parameters.AddWithValue(str, EngineState.VariableDictionary[str].ToString());
                             }
                             else
                             {
-                                command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableCollection[str].ToString()));
+                                command.Parameters.AddWithValue(str, String.Format("'{0}'", EngineState.VariableDictionary[str].ToString()));
                             }
                         }
                     }
@@ -121,13 +121,13 @@ namespace RPA.Core
                     {
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            if (EngineState.VariableCollection.ContainsKey(reader.GetName(i)))
+                            if (EngineState.VariableDictionary.ContainsKey(reader.GetName(i)))
                             {
-                                EngineState.VariableCollection[reader.GetName(i)] = reader[i];
+                                EngineState.VariableDictionary[reader.GetName(i)] = reader[i];
                             }
                             else
                             {
-                                EngineState.VariableCollection.Add(reader.GetName(i), reader[i]);
+                                EngineState.VariableDictionary.Add(reader.GetName(i), reader[i]);
                             }
                         }
                     }

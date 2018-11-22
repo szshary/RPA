@@ -117,7 +117,7 @@ namespace RPA.Core
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("Id"))
             {
                 RefreshHtmlFrames(parameters);
-                EngineState.ConditionalStack.Push(EngineState.VariableCollection[parameters["Variable"]].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
+                EngineState.ConditionalStack.Push(EngineState.VariableDictionary[parameters["Variable"]].ToString().Equals(_htmlDriver.FindElement(By.Id(parameters["Id"])).Text.Trim()));
             }
         }
 
@@ -159,9 +159,9 @@ namespace RPA.Core
                     {
                         targetElement.SendKeys(parameters["Value"]);
                     }
-                    else if (parameters.ContainsKey("Variable") && EngineState.VariableCollection.ContainsKey(parameters["Variable"]))
+                    else if (parameters.ContainsKey("Variable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
                     {
-                        targetElement.SendKeys(EngineState.VariableCollection[parameters["Variable"]].ToString());
+                        targetElement.SendKeys(EngineState.VariableDictionary[parameters["Variable"]].ToString());
                     }
                 }
             }
