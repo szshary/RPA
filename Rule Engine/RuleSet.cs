@@ -12,7 +12,7 @@ namespace RPA.Core
         abstract public void ExecuteElementEndRule(String actionName);
 
         protected RuleSet()
-        {   
+        {
             _elementStartRules = new Dictionary<String, Action<Dictionary<String, String>>>();
             _elementEndRules = new Dictionary<String, Action>();
         }
@@ -21,7 +21,7 @@ namespace RPA.Core
     abstract public class StatefulRuleSet : RuleSet
     {
         public readonly RuleEngineState EngineState;
-        
+
         protected StatefulRuleSet() : base()
         {
             EngineState = new RuleEngineState();

@@ -209,7 +209,7 @@ namespace RPA.Core
             parameters.Add("FileName", taskFileName);
             try
             {
-                for(int i = 0; i < threadCount; i++)
+                for (int i = 0; i < threadCount; i++)
                 {
                     //Task.Factory.
 
