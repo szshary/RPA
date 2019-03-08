@@ -47,13 +47,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credit_Life_Insurance_Calcu
 	ProjectSection(SolutionItems) = preProject
 		Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml = Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml
 		Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml
+		Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop_2.xml = Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop_2.xml
 		Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65}"
 	ProjectSection(SolutionItems) = preProject
-		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Peşin.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Peşin.xlsm
-		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Uzun Süreli.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\Uzun Süreli.xlsm
+		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\kobi_usv_prim_exceli.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\kobi_usv_prim_exceli.xlsm
+		Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\kobi_yıllık_vefat_prim_exceli.xlsm = Automated Processes\Credit_Life_Insurance_Calculation\ExcelDocuments\kobi_yıllık_vefat_prim_exceli.xlsm
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rule Engine", "Rule Engine\Rule Engine.csproj", "{A01BAEB0-C844-4588-9A53-702C7E47AE86}"

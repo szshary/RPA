@@ -1,14 +1,14 @@
 ﻿<Task>
   <Optional>
-    <ExcelSession Folder="ExcelDocuments" FileName="Uzun Süreli.xlsm">
+    <ExcelSession Folder="ExcelDocuments" FileName="kobi_usv_prim_exceli.xlsm">
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
       <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
-      <LoopUntilEqual Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Long_Term_Loop.xml"/>
+      <LoopUntilEqual Variable="CURRENT_ROW" OtherVariable="ROW_COUNT" FileName="Long_Term_Loop_2.xml"/>
     </ExcelSession>
   </Optional>
   <Optional Name="Process_Prepayment">
-    <ExcelSession Folder="ExcelDocuments" FileName="Peşin.xlsm">
+    <ExcelSession Folder="ExcelDocuments" FileName="kobi_yıllık_vefat_prim_exceli.xlsm">
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
       <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>

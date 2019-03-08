@@ -99,12 +99,11 @@ namespace RPA.Core
                 command.CommandTimeout = 500000;
                 if (parameters.ContainsKey("ParameterVariables"))
                 {
-                    Regex numberRegex = new Regex("^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$");
                     foreach (String str in parameters["ParameterVariables"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (EngineState.VariableDictionary.ContainsKey(str))
                         {
-                            if (numberRegex.IsMatch(EngineState.VariableDictionary[str].ToString()))
+                            if (Regex.IsMatch(EngineState.VariableDictionary[str].ToString(), "^[1-9]{1}[0-9]{0,}([.]{1}[0-9]{1,}){0,1}$"))
                             {
                                 command.Parameters.AddWithValue(str, EngineState.VariableDictionary[str].ToString());
                             }
