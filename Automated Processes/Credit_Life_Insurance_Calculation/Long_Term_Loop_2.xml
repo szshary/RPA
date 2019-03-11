@@ -2,6 +2,8 @@
   <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="CURRENT_ROW"/>
   <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="CURRENT_ROW"/>
   <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="ELMA1234">
+    <CopyVariable Variable ="GRP" IntoVariable="GRP_ORG"/>
+    <SetVariable Variable ="GRP" Regex="(_1)" ReplaceWith=""/>
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT DISTINCT A.TEDSEK, TRIM(SUBSTR(A.REZEV1, 1, 1)) AS PESIN_YILLIK,
     (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR, (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL))
     AS DOGTAR, A.MUDYIL AS MUDSUR, C.BSMV, C.KKDF, C.KRDFA FROM CHAYDAT.HAYESDET A INNER JOIN CGNLLIB.PFMUSKIS B ON A.MUSID = B.MUSID
@@ -16,7 +18,7 @@
     Y AS(SELECT X.* FROM X ORDER BY X.TMNSIR) SELECT Y.TMNTUT FROM Y"/>
   </DatabaseSession>
   <!-- B4 -->
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="GRP" TargetColumn="2" TargetRow="4"/>
+  <WriteToExcelCell TargetWorksheet="Hesap" Variable="GRP_ORG" TargetColumn="2" TargetRow="4"/>
   <!-- B13 -->
   <WriteToExcelCell TargetWorksheet="Hesap" Variable="TEDSEK" TargetColumn="2" TargetRow="13"/>
   <!-- B14 -->
@@ -44,6 +46,8 @@
       <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="13" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
       <!-- J14 -->
       <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="14" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
+      <!-- J7 -->
+      <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
     </True>
   </CompareVariableWithValue>
   <CompareVariableWithValue Variable="TEDSEK" Value="1">
@@ -56,6 +60,8 @@
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="9" SourceRow="10" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
           <!-- I11 -->
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="9" SourceRow="11" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
+          <!-- I5 -->
+          <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="9" SourceRow="5" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
         </True>
         <False>
           <!-- J6 -->
@@ -64,6 +70,8 @@
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="10" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
           <!-- J11 -->
           <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="11" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
+          <!-- J5 -->
+          <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="10" SourceRow="5" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
         </False>
       </CompareVariableWithValue>
     </True>

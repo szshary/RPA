@@ -2,6 +2,8 @@
   <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="CURRENT_ROW"/>
   <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="CURRENT_ROW"/>
   <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="ELMA1234">
+    <CopyVariable Variable ="GRP" IntoVariable="GRP_ORG"/>
+    <SetVariable Variable ="GRP" Regex="(_1)" ReplaceWith=""/>
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT DISTINCT (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR,
                                  (DIGITS(B.DOGAY) || '/' || DIGITS(B.DOGGUN) || '/' || DIGITS(B.DOGYIL)) AS DOGTAR, (A.MUDYIL*12+A.MUDAY) AS MUDSUR FROM CHAYDAT.HAYESDET A INNER
                                  JOIN CGNLLIB.PFMUSKIS B ON A.MUSID = B.MUSID WHERE A.GRP = @GRP AND A.POL = @POL UNION ALL SELECT DISTINCT
@@ -10,24 +12,24 @@
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT A.TMNTUT FROM CHAYDAT.PFTEMIN A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND A.POL = @POL UNION ALL
                                  SELECT A.TMNTUT FROM CKTCHAY.PFTEMIN A WHERE A.TMNSIR = 1 AND A.GRP = @GRP AND A.POL = @POL;"/>
   </DatabaseSession>
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="GRP" TargetColumn="2" TargetRow="2"/>
+  <WriteToExcelCell TargetWorksheet="hesap" Variable="GRP_ORG" TargetColumn="2" TargetRow="2"/>
   <!-- B2 -->
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="BASTAR" TargetColumn="2" TargetRow="4"/>
+  <WriteToExcelCell TargetWorksheet="hesap" Variable="BASTAR" TargetColumn="2" TargetRow="4"/>
   <!-- B4 -->
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="DOGTAR" TargetColumn="2" TargetRow="5"/>
+  <WriteToExcelCell TargetWorksheet="hesap" Variable="DOGTAR" TargetColumn="2" TargetRow="5"/>
   <!-- B5 -->
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="MUDSUR" TargetColumn="2" TargetRow="6"/>
+  <WriteToExcelCell TargetWorksheet="hesap" Variable="MUDSUR" TargetColumn="2" TargetRow="6"/>
   <!-- B6 -->
-  <WriteToExcelCell TargetWorksheet="Hesap" Variable="TMNTUT" TargetColumn="2" TargetRow="7"/>
+  <WriteToExcelCell TargetWorksheet="hesap" Variable="TMNTUT" TargetColumn="2" TargetRow="7"/>
   <!-- B7 -->
 
-  <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="5" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="CURRENT_ROW"/>
+  <CopyExcelCellToExcelCell SourceWorksheet="hesap" SourceColumn="5" SourceRow="4" TargetWorksheet="Otomasyon" TargetColumn="3" TargetRowVariable="CURRENT_ROW"/>
   <!-- E4 -->
-  <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="5" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
+  <CopyExcelCellToExcelCell SourceWorksheet="hesap" SourceColumn="5" SourceRow="7" TargetWorksheet="Otomasyon" TargetColumn="4" TargetRowVariable="CURRENT_ROW"/>
   <!-- E7 -->
-  <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="5" SourceRow="6" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
+  <CopyExcelCellToExcelCell SourceWorksheet="hesap" SourceColumn="5" SourceRow="6" TargetWorksheet="Otomasyon" TargetColumn="5" TargetRowVariable="CURRENT_ROW"/>
   <!-- E6 -->
-  <CopyExcelCellToExcelCell SourceWorksheet="Hesap" SourceColumn="5" SourceRow="3" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
+  <CopyExcelCellToExcelCell SourceWorksheet="hesap" SourceColumn="5" SourceRow="3" TargetWorksheet="Otomasyon" TargetColumn="6" TargetRowVariable="CURRENT_ROW"/>
   <!-- E3 -->
   <SetVariable Variable="CURRENT_ROW" Increment="1"/>
 </Phase>

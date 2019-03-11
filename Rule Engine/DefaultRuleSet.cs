@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RPA.Core
 {
@@ -418,6 +419,21 @@ namespace RPA.Core
             }
         }
 
+        private void CopyVariable(Dictionary<String, String> parameters)
+        {
+            if (parameters.ContainsKey("Variable") && parameters.ContainsKey("IntoVariable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
+            {
+                if (EngineState.VariableDictionary.ContainsKey(parameters["IntoVariable"]))
+                {
+                    EngineState.VariableDictionary[parameters["IntoVariable"]] = EngineState.VariableDictionary[parameters["Variable"]];
+                }
+                else
+                {
+                    EngineState.VariableDictionary.Add(parameters["IntoVariable"], EngineState.VariableDictionary[parameters["Variable"]]);
+                }
+            }
+        }
+
         private void SetVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable"))
@@ -433,17 +449,24 @@ namespace RPA.Core
                         EngineState.VariableDictionary.Add(parameters["Variable"], parameters["Value"]);
                     }
                 }
-                else if (parameters.ContainsKey("ConcatenateText") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
+                else if (EngineState.VariableDictionary.ContainsKey(parameters["Variable"]))
                 {
-                    EngineState.VariableDictionary[parameters["Variable"]] += parameters["ConcatenateText"];
-                }
-                else if (parameters.ContainsKey("ConcatenateVariable") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && EngineState.VariableDictionary.ContainsKey(parameters["ConcatenateVariable"]))
-                {
-                    EngineState.VariableDictionary[parameters["Variable"]] += EngineState.VariableDictionary[parameters["ConcatenateVariable"]].ToString();
-                }
-                else if (parameters.ContainsKey("Increment") && EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && Int32.TryParse(parameters["Increment"], out int increment))
-                {
-                    EngineState.VariableDictionary[parameters["Variable"]] = Int32.Parse(EngineState.VariableDictionary[parameters["Variable"]].ToString()) + increment;
+                    if (parameters.ContainsKey("ConcatenateText"))
+                    {
+                        EngineState.VariableDictionary[parameters["Variable"]] += parameters["ConcatenateText"];
+                    }
+                    else if (parameters.ContainsKey("ConcatenateVariable") && EngineState.VariableDictionary.ContainsKey(parameters["ConcatenateVariable"]))
+                    {
+                        EngineState.VariableDictionary[parameters["Variable"]] += EngineState.VariableDictionary[parameters["ConcatenateVariable"]].ToString();
+                    }
+                    else if (parameters.ContainsKey("Increment") && Int32.TryParse(parameters["Increment"], out int increment))
+                    {
+                        EngineState.VariableDictionary[parameters["Variable"]] = Int32.Parse(EngineState.VariableDictionary[parameters["Variable"]].ToString()) + increment;
+                    }
+                    else if (parameters.ContainsKey("Regex") && parameters.ContainsKey("ReplaceWith"))
+                    {
+                        EngineState.VariableDictionary[parameters["Variable"]] = Regex.Replace(EngineState.VariableDictionary[parameters["Variable"]].ToString(), parameters["Regex"], parameters["ReplaceWith"]);
+                    }
                 }
             }
         }

@@ -8,7 +8,7 @@
     </ExcelSession>
   </Optional>
   <Optional Name="Process_Prepayment">
-    <ExcelSession Folder="ExcelDocuments" FileName="kobi_yıllık_vefat_prim_exceli.xlsm">
+    <ExcelSession Folder="ExcelDocuments" FileName="kobi yıllık vefat prim exceli.xlsm">
       <StoreUsedRangeRowCountToVariable SourceWorksheet="Otomasyon" Variable="ROW_COUNT"/>
       <SetVariable Variable="ROW_COUNT" Increment="1"/>
       <SetVariable Variable="CURRENT_ROW" Value="2"/>
