@@ -13,6 +13,7 @@ namespace RPA.Core
         {
             _elementStartRules.Add("AddColumnToTable", AddColumnToTable);
             _elementStartRules.Add("ClearTable", ClearTable);
+            _elementStartRules.Add("CopyVariable", CopyVariable);
             _elementStartRules.Add("CreateTable", CreateTable);
             _elementStartRules.Add("ExtractVariablesFromTable", ExtractVariablesFromTable);
             _elementStartRules.Add("LogEvent", LogEvent);
