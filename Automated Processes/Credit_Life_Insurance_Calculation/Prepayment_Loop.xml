@@ -1,7 +1,7 @@
 ﻿<Phase Name="FunctionTrial">
   <StoreExcelCellToVariable Variable="GRP" SourceWorksheet="Otomasyon" SourceColumn="1" SourceRowVariable="CURRENT_ROW"/>
   <StoreExcelCellToVariable Variable="POL" SourceWorksheet="Otomasyon" SourceColumn="2" SourceRowVariable="CURRENT_ROW"/>
-  <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="ELMA1234">
+  <DatabaseSession Host="10.10.10.106" User="OTOMASYON" Password="OTOMASYON">
     <CopyVariable Variable ="GRP" IntoVariable="GRP_ORG"/>
     <SetVariable Variable ="GRP" Regex="(_1)" ReplaceWith=""/>
     <StoreQueryResultToVariables ParameterVariables="GRP,POL,GRP,POL" SelectQuery="SELECT DISTINCT (DIGITS(A.BAY) || '/' || DIGITS(A.BGUN) || '/' || DIGITS(A.BYIL)) AS BASTAR,
