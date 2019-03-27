@@ -134,9 +134,8 @@ namespace RPA.Core
                         while (readerXML.Read())
                         {
                             actionParameters.Clear();
-                            for (int attCnt = 0; attCnt < readerXML.AttributeCount; attCnt++)
+                            while (readerXML.MoveToNextAttribute())
                             {
-                                readerXML.MoveToAttribute(attCnt);
                                 actionParameters.Add(readerXML.Name, readerXML.Value);
                             }
                             readerXML.MoveToElement();
@@ -192,28 +191,12 @@ namespace RPA.Core
 
         public void ExecuteTaskFile(String taskFileName)
         {
-            Dictionary<String, String> parameters = new Dictionary<String, String>();
-            parameters.Add("FileName", taskFileName);
+            Dictionary<String, String> parameters = new Dictionary<String, String>
+            {
+                { "FileName", taskFileName }
+            };
             try
             {
-                ExecuteTaskFile(parameters);
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
-        public void ExecuteConcurrently(String taskFileName, int threadCount)
-        {
-            Dictionary<String, String> parameters = new Dictionary<String, String>();
-            parameters.Add("FileName", taskFileName);
-            try
-            {
-                for (int i = 0; i < threadCount; i++)
-                {
-                    //Task.Factory.
-
-                }
                 ExecuteTaskFile(parameters);
             }
             catch (Exception ex)
