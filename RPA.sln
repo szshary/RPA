@@ -20,13 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compensation_File_Creation", "Compensation_File_Creation", "{9AD36E18-FFBB-4586-A556-EB5CC068857C}"
 	ProjectSection(SolutionItems) = preProject
-		Automated Processes\Compensation_File_Creation\Create_Compensation_File_Main.xml = Automated Processes\Compensation_File_Creation\Create_Compensation_File_Main.xml
-		Automated Processes\Compensation_File_Creation\Create_Compensation_File_Sub.xml = Automated Processes\Compensation_File_Creation\Create_Compensation_File_Sub.xml
-		Automated Processes\Compensation_File_Creation\Create_CRM_Cases_Loop.xml = Automated Processes\Compensation_File_Creation\Create_CRM_Cases_Loop.xml
-		Automated Processes\Compensation_File_Creation\Create_Customer_Letters_Loop.xml = Automated Processes\Compensation_File_Creation\Create_Customer_Letters_Loop.xml
+		Automated Processes\Compensation_File_Creation\CreateCompensationFile.xml = Automated Processes\Compensation_File_Creation\CreateCompensationFile.xml
 		Automated Processes\Compensation_File_Creation\EventLog.txt = Automated Processes\Compensation_File_Creation\EventLog.txt
-		Automated Processes\Compensation_File_Creation\Product_Logic_Loop.xml = Automated Processes\Compensation_File_Creation\Product_Logic_Loop.xml
-		Automated Processes\Compensation_File_Creation\Scrape_Policies_From_Console_Loop.xml = Automated Processes\Compensation_File_Creation\Scrape_Policies_From_Console_Loop.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WordDocumentTemplates", "WordDocumentTemplates", "{4330A59C-5C19-493A-BB9D-C6E26BE8266C}"
@@ -45,10 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Letters", "Letters", "{1EC6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credit_Life_Insurance_Calculation", "Credit_Life_Insurance_Calculation", "{8862F28D-D2F7-4A04-B310-4D05F92CC243}"
 	ProjectSection(SolutionItems) = preProject
-		Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml = Automated Processes\Credit_Life_Insurance_Calculation\Credit_Life_Insurance_Calculation_Main.xml
-		Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop.xml
-		Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop_2.xml = Automated Processes\Credit_Life_Insurance_Calculation\Long_Term_Loop_2.xml
-		Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml = Automated Processes\Credit_Life_Insurance_Calculation\Prepayment_Loop.xml
+		Automated Processes\Credit_Life_Insurance_Calculation\CreditLifeInsuranceCalculation.xml = Automated Processes\Credit_Life_Insurance_Calculation\CreditLifeInsuranceCalculation.xml
+		CreditLifeInsuranceCalculation_Old.xml = CreditLifeInsuranceCalculation_Old.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65}"

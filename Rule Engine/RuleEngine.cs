@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 
@@ -21,7 +20,6 @@ namespace RPA.Core
 
             _elementStartRules.Add("LoopUntilEqual", LoopUntilEqual);
             _elementStartRules.Add("LoopThroughTable", LoopThroughTable);
-            _elementStartRules.Add("ExecuteTaskFile", ExecuteTaskFile);
 
             _elementStartRules.Add("BrowserSession", AddBrowserRuleSet);
             _elementEndRules.Add("BrowserSession", ShrinkRuleSet);
@@ -85,20 +83,20 @@ namespace RPA.Core
 
         private void LoopUntilEqual(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Variable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["OtherVariable"]))))
+            if (parameters.ContainsKey("Section") && parameters.ContainsKey("Variable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["Variable"]) && (parameters.ContainsKey("Value") ^ (parameters.ContainsKey("OtherVariable") && _activeRuleSets.Peek().EngineState.VariableDictionary.ContainsKey(parameters["OtherVariable"]))))
             {
                 if (parameters.ContainsKey("Value"))
                 {
                     while (!_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["Variable"]].ToString().Equals(parameters["Value"]))
                     {
-                        ExecuteTaskFile(parameters);
+                        ExecuteSection(_activeRuleSets.Peek().EngineState.TaskXmlDocument.SelectSingleNode(String.Format("/Task/Section[@Name='{0}']", parameters["Section"])));
                     }
                 }
                 else
                 {
                     while (!_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["Variable"]].ToString().Equals(_activeRuleSets.Peek().EngineState.VariableDictionary[parameters["OtherVariable"]].ToString()))
                     {
-                        ExecuteTaskFile(parameters);
+                        ExecuteSection(_activeRuleSets.Peek().EngineState.TaskXmlDocument.SelectSingleNode(String.Format("/Task/Section[@Name='{0}']", parameters["Section"])));
                     }
                 }
             }
@@ -106,7 +104,7 @@ namespace RPA.Core
 
         private void LoopThroughTable(Dictionary<String, String> parameters)
         {
-            if (parameters.ContainsKey("FileName") && parameters.ContainsKey("Table") && _activeRuleSets.Peek().EngineState.TableList.Exists((x) => { return (x.TableName == parameters["Table"]); }))
+            if (parameters.ContainsKey("Section") && parameters.ContainsKey("Table") && _activeRuleSets.Peek().EngineState.TableList.Exists((x) => { return (x.TableName == parameters["Table"]); }))
             {
                 foreach (DataRow dr in (_activeRuleSets.Peek().EngineState.TableList.Find((x) => { return (x.TableName == parameters["Table"]); }).Rows))
                 {
@@ -117,87 +115,82 @@ namespace RPA.Core
                             _activeRuleSets.Peek().EngineState.VariableDictionary[col.ColumnName] = dr.ItemArray[col.Ordinal].ToString();
                         }
                     }
-                    ExecuteTaskFile(parameters);
+                    ExecuteSection(_activeRuleSets.Peek().EngineState.TaskXmlDocument.SelectSingleNode(String.Format("/Task/Section[@Name='{0}']", parameters["Section"])));
                 }
             }
         }
 
-        private void ExecuteTaskFile(Dictionary<String, String> parameters)
+        private void ExecuteSection(XmlNode section)
         {
-            if (parameters.ContainsKey("FileName") && File.Exists(Path.Combine(Directory.GetCurrentDirectory(), parameters["FileName"])))
+            using (XmlNodeReader readerXML = new XmlNodeReader(section))
             {
-                using (XmlTextReader readerXML = new XmlTextReader(Path.Combine(Directory.GetCurrentDirectory(), parameters["FileName"])))
+                try
                 {
-                    try
+                    Dictionary<String, String> actionParameters = new Dictionary<String, String>();
+                    while (readerXML.Read())
                     {
-                        Dictionary<String, String> actionParameters = new Dictionary<String, String>();
-                        while (readerXML.Read())
+                        actionParameters.Clear();
+                        while (readerXML.MoveToNextAttribute())
                         {
-                            actionParameters.Clear();
-                            while (readerXML.MoveToNextAttribute())
-                            {
-                                actionParameters.Add(readerXML.Name, readerXML.Value);
-                            }
-                            readerXML.MoveToElement();
-                            switch (readerXML.NodeType)
-                            {
-                                case XmlNodeType.Element:
-                                    switch (readerXML.Name)
-                                    {
-                                        case "True":
-                                            if (!_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
-                                            {
-                                                readerXML.Skip();
-                                            }
-                                            break;
-                                        case "False":
-                                            if (_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
-                                            {
-                                                readerXML.Skip();
-                                            }
-                                            break;
-                                        case "Optional":
-                                            if (MessageBox.Show(String.Format("Would you like to process {0} optional section?", actionParameters.ContainsKey("Name") ? actionParameters["Name"] : "the following"), "Optional Section Execution Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                                            {
-                                                readerXML.Skip();
-                                            }
-                                            break;
-                                        default:
-                                            ExecuteElementStartRule(readerXML.Name, actionParameters);
-                                            break;
-                                    }
-                                    break;
-                                case XmlNodeType.EndElement:
-                                    switch (readerXML.Name)
-                                    {
-                                        case "True":
-                                        case "False":
-                                        case "Optional":
-                                            break;
-                                        default:
-                                            ExecuteElementEndRule(readerXML.Name);
-                                            break;
-                                    }
-                                    break;
-                            }
+                            actionParameters.Add(readerXML.Name, readerXML.Value);
+                        }
+                        readerXML.MoveToElement();
+                        switch (readerXML.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                switch (readerXML.Name)
+                                {
+                                    case "True":
+                                        if (!_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
+                                        {
+                                            readerXML.Skip();
+                                        }
+                                        break;
+                                    case "False":
+                                        if (_activeRuleSets.Peek().EngineState.ConditionalStack.Peek())
+                                        {
+                                            readerXML.Skip();
+                                        }
+                                        break;
+                                    case "Optional":
+                                        if (MessageBox.Show(String.Format("Would you like to process {0} optional section?", actionParameters.ContainsKey("Name") ? actionParameters["Name"] : "the following"), "Optional Section Execution Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                                        {
+                                            readerXML.Skip();
+                                        }
+                                        break;
+                                    default:
+                                        ExecuteElementStartRule(readerXML.Name, actionParameters);
+                                        break;
+                                }
+                                break;
+                            case XmlNodeType.EndElement:
+                                switch (readerXML.Name)
+                                {
+                                    case "True":
+                                    case "False":
+                                    case "Optional":
+                                        break;
+                                    default:
+                                        ExecuteElementEndRule(readerXML.Name);
+                                        break;
+                                }
+                                break;
                         }
                     }
-                    catch (Exception ex)
-                    {
-                    }
+                }
+                catch (Exception ex)
+                {
                 }
             }
         }
 
         public void ExecuteTaskFile(String taskFileName)
         {
-            Dictionary<String, String> parameters = new Dictionary<String, String>
-            {
-                { "FileName", taskFileName }
-            };
             try
             {
-                ExecuteTaskFile(parameters);
+                _activeRuleSets.Peek().EngineState.TaskXmlDocument.Load(Path.Combine(Directory.GetCurrentDirectory(), taskFileName));
+
+                ExecuteSection(_activeRuleSets.Peek().EngineState.TaskXmlDocument.SelectSingleNode("/Task/Section[@Name='Main']"));
             }
             catch (Exception ex)
             {

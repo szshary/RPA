@@ -17,7 +17,7 @@ namespace RPA.Core
             _elementStartRules.Add("ClearExcelRange", ClearExcelRange);
             _elementStartRules.Add("CopyExcelCellToExcelCell", CopyExcelCellToExcelCell);
             _elementStartRules.Add("StoreUsedRangeRowCountToVariable", StoreUsedRangeRowCountToVariable);
-            _elementStartRules.Add("StoreExcelCellToVariable", StoreExcelCellToVariable);
+            _elementStartRules.Add("CopyExcelCellToVariable", CopyExcelCellToVariable);
             _elementStartRules.Add("StoreExcelRangeToTable", StoreExcelRangeToTable);
             _elementStartRules.Add("WriteToExcelCell", WriteToExcelCell);
 
@@ -153,7 +153,7 @@ namespace RPA.Core
             }
         }
 
-        private void StoreExcelCellToVariable(Dictionary<String, String> parameters)
+        private void CopyExcelCellToVariable(Dictionary<String, String> parameters)
         {
             if (parameters.ContainsKey("Variable") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
             {

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4FFFF960-3F42-4914-ADC9-4ECF12759863}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>RPA.Core</RootNamespace>
     <AssemblyName>Rule File Selector</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>

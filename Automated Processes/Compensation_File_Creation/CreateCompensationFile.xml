@@ -1,0 +1,474 @@
+﻿<Task>
+  <Section Name="Main">
+  <ExcelSession Folder="ExcelDocuments" FileName="070_Police_vadesi.xlsx">
+    <!-- Get_Heir_Info -->
+    <Phase Name="Get_Heir_Info" >
+      <StoreExcelRangeToTable Worksheet="Sayfa1" Table="Heir_Exists_During_Jeopardy_List"/>
+      <AddColumnToTable Table="Heir_Exists_During_Jeopardy_List" Column="LETTERS_SENT" MaxLength="5"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="VARIS_SIRA_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="POLICE_SERTIFIKA_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="SBM_HAYMER_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="SIGORTA_SIRKET_KODU"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="POLICE_SERTIFIKA_YENILEME_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="SIGORTALI_KIMLIK_TIPI"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="POLICE_BASLAMA_TARIHI"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="POLICE_BITIS_TARIHI"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="VARIS_KIMLIK_TIPI"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="YAKINLIK"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="ADRES_IL_KODU"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="UAVT_ADRES_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="TAZMINAT_NO"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="TOPLAM_ODENEN_TAZMINAT"/>
+      <RemoveColumnFromTable Table="Heir_Exists_During_Jeopardy_List" Column="TOPLAM_VEFAT_TEMINATI_TUTARI"/>
+    </Phase>
+  </ExcelSession>
+  <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="H4RB1NG3R">
+  <!--<DatabaseSession Host="10.10.10.1" User="PRO2456" Password="H4RB1NG3R">-->
+    <Phase Name="Get_Group_Types" >
+      <StoreQueryResultToTable Table="Group_Types" SelectQuery="SELECT A.GRPKOD AS GROUP_CODE, (CASE WHEN A.TANKOD = 10 AND SUBSTR(A.RZV25, 5, 1) = 'İ' THEN 'KKDS' WHEN((A.TANKOD = 15 AND A.GRPFER = 'F' AND A.GRPKOK = ' ') OR (A.GRPKOD IN (162, 166, 240, 283, 284)) OR(A.RZV45 = 2 AND A.RZV48 &lt;&gt; 1)) THEN 'KDS' WHEN A.GRPKOD IN (6, 204, 837) THEN 'WILLSKIP' WHEN A.TANKOD = 10 THEN 'YILLIK_VEFAT' WHEN A.TANKOD = 24 THEN 'IRAT' ELSE 'STANDARD' END) AS GROUP_TYPE, (CASE WHEN A.DVZCDE = 0 THEN 'TL' ELSE 'DV' END) AS CURRENCY_TYPE FROM CGNLLIB.PFGRPTAN A WHERE A.KATKOD = 0 ORDER BY A.GRPKOD"/>
+      <SetPrimaryKeyOfTable Table="Group_Types" UniqueConstraintColumns="GROUP_CODE"/>
+    </Phase>
+  </DatabaseSession>
+  <TN5250Session Host="10.10.10.106" Port="23">
+  <!--<TN5250Session Host="10.10.10.1" Port="23">-->
+    <!-- Login -->
+    <Phase Name="Login" >
+      <WriteToTN5250 Value="PRO2456" Submit="false" MaxLength="10"/>
+      <WriteToTN5250 Value="H4RB1NG3R" Submit="true"/>
+    </Phase>
+    <!-- IsQueueAlreadyAllocated -->
+    <CompareValueWithTN5250 Value="PRO2456" Left="16" Top="4">
+      <True>
+        <WriteToTN5250 Value="" Submit="true"/>
+      </True>
+    </CompareValueWithTN5250>
+    <!-- PRO2456_Redundant -->
+    <Phase Name="PRO2456_Redundant">
+      <WriteToTN5250 Value="CALL HYCLP001" Submit="true"/>
+      <WriteToTN5250 Value="" Submit="true"/>
+      <WriteToTN5250 Value="" Submit="true"/>
+    </Phase>
+    <!-- Get_Policies_by_TC_Number -->
+    <Phase>
+      <WriteToTN5250 Value="5" Submit="true"/>
+      <WriteToTN5250 Value="13" Submit="true"/>
+      <WriteToTN5250 Value="1" Submit="true"/>
+      <!-- Start TC No Query screen with dummy TC Num -->
+      <WriteToTN5250 Value="1" Submit="true"/>
+    </Phase>
+    <!-- Create_Mental_Table_Policies_Of_Customers -->
+    <Phase>
+    	<SetVariable Variable="SIGORTALI_KIMLIK_NO" Value="1000001"/>
+    	<SetVariable Variable="GROUP_CODE" Value=""/>
+    	<SetVariable Variable="POLICY_CODE" Value=""/>
+    	<SetVariable Variable="SEVK_CODE" Value=""/>
+    	<SetVariable Variable="VEFAT_TARIHI" Value=""/>
+    	<CreateTable Table="Policies_Of_Customers"/>
+    	<AddColumnToTable Table="Policies_Of_Customers" Column="GROUP_CODE" MaxLength="5"/>
+    	<AddColumnToTable Table="Policies_Of_Customers" Column="POLICY_CODE" MaxLength="8"/>
+      <AddColumnToTable Table="Policies_Of_Customers" Column="SIGORTALI_KIMLIK_NO" MaxLength="11"/>
+      <AddColumnToTable Table="Policies_Of_Customers" Column="SEVK_CODE" MaxLength="5"/>
+      <AddColumnToTable Table="Policies_Of_Customers" Column="FILE_OPENNED_FLAG" MaxLength="1"/>
+      <SetPrimaryKeyOfTable Table="Policies_Of_Customers" UniqueConstraintColumns="GROUP_CODE,POLICY_CODE"/>
+    </Phase>
+    <Phase Name="Scrape_Policies_From_Console">
+      <LoopThroughTable Section="ScrapePoliciesFromConsoleLoop" Table="Heir_Exists_During_Jeopardy_List"/>
+    </Phase>
+    <!-- Switch_Menu -->
+    <Phase>
+      <!-- Customer_No_Not_Found -->
+      <CompareValueWithTN5250 ComparedValue="GÖRÜNTÜLENEBİLECEK BİR BİLGİ BULUNMAMAKTADIR." Left="20" Top="12">
+        <True>
+          <WriteToTN5250 Value="" Submit="true"/>
+        </True>
+      </CompareValueWithTN5250>
+      <SendFunctionKeyToTN5250 FunctionKey="F1"/>
+      <SendFunctionKeyToTN5250 FunctionKey="F1"/>
+      <SendFunctionKeyToTN5250 FunctionKey="F1"/>
+      <WriteToTN5250 Value="3" Submit="true"/>
+      <WriteToTN5250 Value="1" Submit="true"/>
+      <WriteToTN5250 Value="2" Submit="true"/>
+      <CompareValueWithTN5250 Value="Fon Yönetimi tarafından" Left="11" Top="8">
+        <True>
+          <LogEvent Format="Günlük fon fiyatları girilmediğinden dosya açımı işlemine başlanamamaktadır."/>
+          <Terminate/>
+        </True>
+      </CompareValueWithTN5250>
+    </Phase>
+    <!-- Create_Compensation_Files -->
+    <Phase>
+      <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="H4RB1NG3R">
+      <!--<DatabaseSession Host="10.10.10.1" User="PRO2456" Password="H4RB1NG3R">-->
+        <LoopThroughTable Section="ProductLogicLoop" Table="Policies_Of_Customers"/>
+      </DatabaseSession>
+    </Phase>
+  </TN5250Session>
+  <DatabaseSession Host="10.10.10.106" User="PRO2456" Password="H4RB1NG3R">
+  <!--<DatabaseSession Host="10.10.10.1" User="PRO2456" Password="H4RB1NG3R">-->
+    <!-- Create_Cutomer_Letters -->
+    <WordSession Folder="WordDocumentTemplates" TemplateFileName="SBM vefat.docx">
+      <Phase>
+        <SetVariable Variable="LETTER_COUNTER" Value="1"/>
+        <SetVariable Variable="LETTERS_SENT" Value=""/>
+        <SetVariable Variable="BENEFICIARY_FULLNAME" Value=""/>
+        <SetVariable Variable="AD" Value=""/>
+        <SetVariable Variable="SOYAD" Value=""/>
+        <SetVariable Variable="ACIK_ADRES" Value=""/>
+        <SetVariable Variable="DURUMU" Value=""/>
+        <LoopThroughTable Section="CreateCustomerLettersLoop" Table="Heir_Exists_During_Jeopardy_List"/>
+      </Phase>
+    </WordSession>
+  </DatabaseSession>
+  <!--<BrowserSession URL="https://ahecrmtest.anadoluhayat.com.tr/">-->
+  <BrowserSession URL="https://ahecrm.anadoluhayat.com.tr/">
+    <Phase Name="Login">
+      <SendTextToBrowser Id="userNameInput" Value="ANADOLUHAYAT\PRO2456"/>
+      <SendTextToBrowser Id="passwordInput" Value="H4rb1ng3r"/>
+      <ClickBrowser Id="submitButton"/>
+      <ClickBrowser Frame="InlineDialog_Iframe" Id="buttonClose"/>
+    </Phase>
+    <!-- Create_CRM_Cases -->
+    <Phase>
+      <LoopThroughTable Section="CreateCRMCasesLoop" Table="Policies_Of_Customers"/>
+    </Phase>
+  </BrowserSession>
+  </Section>
+  <Section Name="CreateCompensationFileSub">
+    <!-- Process_Standard_TL_Policies -->
+    <CompareVariableWithValue Variable="CURRENCY_TYPE" Value="TL">
+      <True>
+        <WriteToTN5250 Value="1" Submit="true"/>
+      </True>
+    </CompareVariableWithValue>
+    <!-- Process_Standard_DV_Policies -->
+    <CompareVariableWithValue Variable="CURRENCY_TYPE" Value="DV">
+      <True>
+        <WriteToTN5250 Value="2" Submit="true"/>
+      </True>
+    </CompareVariableWithValue>
+    <WriteToTN5250 Variable="GROUP_CODE" MaxLength="5"/>
+    <WriteToTN5250 Variable="POLICY_CODE" Submit="true" MaxLength="8"/>
+    <!-- Skip_If_Policy_Not_Found -->
+    <CompareValueWithTN5250 Value="Grup" Left="25" Top="13">
+      <True>
+        <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin hali hazırda hasar dosyası bulunmaktadır." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+      </True>
+      <False>
+        <WriteToTN5250 Value="24"/>
+        <WriteToTN5250 Value="05"/>
+        <WriteToTN5250 Value="2017"/>
+        <WriteToTN5250 Value="01"/>
+        <WriteToTN5250 Value="31"/>
+        <WriteToTN5250 Variable="DEATH_DAY" MaxLength="2"/>
+        <WriteToTN5250 Variable="DEATH_MONTH" MaxLength="2"/>
+        <WriteToTN5250 Variable="DEATH_YEAR" MaxLength="4"/>
+        <WriteToTN5250 Value="DOĞAL ÖLÜM"/>
+        <SendFunctionKeyToTN5250 FunctionKey="F2"/>
+        <!-- Transfer_Record_Not_Found -->
+        <CompareValueWithTN5250 Value="POLİÇENİN DEVİR KAYDI YOKTUR." Left="14" Top="8">
+          <True>
+            <WriteToTN5250 Value="" Submit="true"/>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin devir kaydı olmadığı için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+          </True>
+          <False>
+            <CompareValueWithTN5250 Value="VEFAT TARİHİ POLİÇE BİTİM TARİHİNDEN SONRADIR." Left="19" Top="9">
+              <True>
+                <WriteToTN5250 Value="" Submit="true"/>
+                <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat tarihi poliçe bitim tarihinden sonra olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+              </True>
+              <False>
+                <CompareValueWithTN5250 Value="VADE GELİMİ TALİMATI GİTMİŞ." Left="14" Top="7">
+                  <True>
+                    <WriteToTN5250 Value="" Submit="true"/>
+                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine vade gelimi talimatı gitmiş olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                  </True>
+                  <False>
+                    <CompareValueWithTN5250 Value="VADE GELİMİ DOSYA AÇIMI İŞLEMLERİ" Left="14" Top="8">
+                      <True>
+                        <WriteToTN5250 Value="" Submit="true"/>
+                        <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vade gelimi işlemleri için Süre Sonu Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                      </True>
+                      <False>
+                        <CompareValueWithTN5250 Value="GERİ ÇEKME MADDESİNDEN GELEN DEVİR KAYDININ" Left="14" Top="7">
+                          <True>
+                            <WriteToTN5250 Value="" Submit="true"/>
+                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine hasar dosyası açılabilmesi için geri çekme maddesinden gelen kaydının günlük karpayına esas hareketlerden atılması gerekmektedir. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                          </True>
+                          <False>
+                            <CompareValueWithTN5250 Value="VEFAT TARİHİ SONRASINDA ÖDENMİŞ OLAN PRİMLERİ" Left="14" Top="7">
+                              <True>
+                                <WriteToTN5250 Value="" Submit="true"/>
+                                <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat sonrası ödenmiş primleri iade edilmediği için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                              </True>
+                              <False>
+                                <CompareValueWithTN5250 Value="AÇILMIŞTIR. ANCAK AKTüERYA HENüZ POLİÇENİN" Left="14" Top="8">
+                                  <True>
+                                    <WriteToTN5250 Value="" Submit="true"/>
+                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin hareket kayıtları henüz düzeltilmediği için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                  </True>
+                                  <False>
+                                    <CompareValueWithTN5250 Value="YENİ İSTİKRAZI OLDUĞUNDAN İŞLEM YAPILAMAZ." Left="14" Top="7">
+                                      <True>
+                                        <WriteToTN5250 Value="" Submit="true"/>
+                                        <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin istikrazı olduğu için hasar dosyası açılmadı. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                      </True>
+                                      <False>
+                                        <CompareValueWithTN5250 Value="İSTİKRAZI OLDUĞUNDAN İŞLEM YAPILAMAZ" Left="14" Top="7">
+                                          <True>
+                                            <WriteToTN5250 Value="" Submit="true"/>
+                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin istikrazı olduğu için hasar dosyası açılmadı. Lütfen Aktüerya Müdürlüğü ile bağlantıya geçiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                          </True>
+                                          <False>
+                                            <CompareValueWithTN5250 Value="POLİÇE VADE GELİMİNE ALINMIŞTIR." Left="14" Top="7">
+                                              <True>
+                                                <WriteToTN5250 Value="" Submit="true"/>
+                                                <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi vade gelimine alındığı için hasar dosyası açılmadı. Lütfen Süre Sonu İşlemleri Müdürlüğü ile bağlantıya geçip vade gelimi maddesinin tersinin çalışmasını isteyiniz." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                              </True>
+                                              <False>
+                                                <CompareValueWithTN5250 Value="T.C. KİMLİK NO HATASI ALINMIŞTIR." Left="14" Top="7">
+                                                  <True>
+                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinine T.C. kimlik numarası sorgulama sırasında hata alındığı için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                  </True>
+                                                  <False>
+                                                    <CompareValueWithTN5250 Value="VERGİ KİMLİK NUMARASI HATALIDIR." Left="14" Top="8">
+                                                      <True>
+                                                        <WriteToTN5250 Value="" Submit="true"/>
+                                                        <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine katılımcının vergi kimlik numarası hatalı olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                      </True>
+                                                      <False>
+                                                        <CompareValueWithTN5250 Value="UYRUK HATALIDIR." Left="14" Top="8">
+                                                          <True>
+                                                            <WriteToTN5250 Value="" Submit="true"/>
+                                                            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine katılımcının uyruğu hatalı olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                          </True>
+                                                          <False>
+                                                            <CompareValueWithTN5250 Value="VEFAT TARİHİ ÜZERİNDEN 2 YIL GEÇMİŞ OLDUĞUNDAN" Left="11" Top="9">
+                                                              <True>
+                                                                <WriteToTN5250 Value="" Submit="true"/>
+                                                                <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesinin vefat tarihinin üzerinden 2 yıldan uzun bir süre geçtiğinden hasar dosyası açılabilmesi için geçiş izni verilmelidir." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                              </True>
+                                                              <False>
+                                                                <CompareValueWithTN5250 Value="SİGORTA DÖNEMİ SONRASINDA ÖDENMİŞ OLAN PRİMLERİN" Left="14" Top="7">
+                                                                  <True>
+                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçeye hasar dosyası açılabilmesi için ilk önce sigorta dönemi sonrası ödenmiş primlerinin iade edilmesi gerekmektedir." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                  </True>
+                                                                  <False>
+                                                                    <SetVariable Variable="FILE_OPENNED_FLAG" Value="X"/>
+                                                                    <MoveVariablesToTable Table="Policies_Of_Customers"/>
+                                                                    <SendFunctionKeyToTN5250 FunctionKey="F4"/>
+                                                                    <WriteToTN5250 Value="" Submit="true"/>
+                                                                    <SendFunctionKeyToTN5250 FunctionKey="F6"/>
+                                                                    <WriteToTN5250 Value="" Submit="true" WaitDuration="3000"/>
+                                                                    <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesine hasar dosyası açıldı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+                                                                    <SendFunctionKeyToTN5250 FunctionKey="F1"/>
+                                                                  </False>
+                                                                </CompareValueWithTN5250>
+                                                              </False>
+                                                            </CompareValueWithTN5250>
+                                                          </False>
+                                                        </CompareValueWithTN5250>
+                                                      </False>
+                                                    </CompareValueWithTN5250>
+                                                  </False>
+                                                </CompareValueWithTN5250>
+                                              </False>
+                                            </CompareValueWithTN5250>
+                                          </False>
+                                        </CompareValueWithTN5250>
+                                      </False>
+                                    </CompareValueWithTN5250>
+                                  </False>
+                                </CompareValueWithTN5250>
+                              </False>
+                            </CompareValueWithTN5250>
+                          </False>
+                        </CompareValueWithTN5250>
+                      </False>
+                    </CompareValueWithTN5250>
+                  </False>
+                </CompareValueWithTN5250>
+              </False>
+            </CompareValueWithTN5250>
+          </False>
+        </CompareValueWithTN5250>
+      </False>
+    </CompareValueWithTN5250>
+  </Section>
+  <Section Name="CreateCRMCasesLoop">
+    <CompareVariableWithValue Variable="FILE_OPENNED_FLAG" Value="X">
+      <True>
+        <ClickBrowser Id="TabHome"/>
+        <ClickBrowser Id="CS"/>
+        <ClickBrowser Id="nav_cases" WaitInvisibleId="nav_cases"/>
+        <ClickBrowser Id="incident|NoRelationship|HomePageGrid|Mscrm.HomepageGrid.incident.NewRecord"/>
+        <SendTextToBrowser Id="header_crmFormSelector" Value="PensionSoft_HSM"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="customerid_ledit" Variable="SIGORTALI_KIMLIK_NO"/>
+        <!--<SendTextToBrowser Frame="contentIFrame1" Id="ps_groupid_ledit" Variable="GROUP_CODE"/>-->
+        <SendTextToBrowser Frame="contentIFrame1" Id="ps_declarationdate_iDateInput" Value="25.9.2017"/>
+        <SetVariable Variable="DEATH_DATE" Value=""/>
+        <SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_DAY"/>
+        <SetVariable Variable="DEATH_DATE" ConcatenateText="."/>
+        <SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_MONTH"/>
+        <SetVariable Variable="DEATH_DATE" ConcatenateText="."/>
+        <SetVariable Variable="DEATH_DATE" ConcatenateVariable="DEATH_YEAR"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="ps_claimdate_iDateInput" Variable="DEATH_DATE"/>
+        <SetVariable Variable="GROUP_POLICY_CODE" Value=""/>
+        <SetVariable Variable="GROUP_POLICY_CODE" ConcatenateVariable="GROUP_CODE"/>
+        <SetVariable Variable="GROUP_POLICY_CODE" ConcatenateText="-"/>
+        <SetVariable Variable="GROUP_POLICY_CODE" ConcatenateVariable="POLICY_CODE"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="ps_policyid_ledit" Variable="GROUP_POLICY_CODE"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="caseorigincode_i" Value="Eposta"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="ps_casecategoryid_ledit" Value="HAYAT - TALEPLER"/>
+        <ClickBrowser Frame="contentIFrame1" Id="ps_casesubcategoryid_lock"/>
+        <SendTextToBrowser Frame="contentIFrame1" Id="ps_casesubcategoryid_ledit" Value="H -Vefat Teminatı"/>
+        <CompareAnyElementOfClassforVisibility Frame="contentIFrame1" Class="ms-crm-Inline-HasError">
+          <True>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi için CRM dosyası açılması sırasında hata alındı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+            <ClickBrowser Id="TabHome"/>
+            <AcceptAlert/>
+          </True>
+          <False>
+            <ClickBrowser Id="incident|NoRelationship|Form|Mscrm.Form.incident.SaveAndClose"/>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi için CRM dosyası açıldı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+          </False>
+        </CompareAnyElementOfClassforVisibility>
+      </True>
+      <False>
+        <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi, CRM dosyası açılmasına uygun değil." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+      </False>
+    </CompareVariableWithValue>
+  </Section>
+  <Section Name="CreateCustomerLettersLoop">
+    <CompareVariableWithValue Variable="DURUMU" Value="AÇIK">
+      <True>
+        <CompareVariableWithValue Variable="LETTERS_SENT" Value="X">
+          <False>
+            <SetColumnInTable Table="Heir_Exists_During_Jeopardy_List" Column="LETTERS_SENT" Value="X" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND DURUMU='AÇIK'" ParameterVariables="SIGORTALI_KIMLIK_NO"/>
+            <ExtractVariablesFromTable Table="Policies_Of_Customers" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND FILE_OPENNED_FLAG='X'" ParameterVariables="SIGORTALI_KIMLIK_NO" SingleOutputTextFormat="{0}/{1}" MultipleOutputTextFormat="{0}/{1}, " OutputVariable="POLICIES" CountVariable="POLICIES_COUNT"/>
+            <CompareVariableWithValue Variable="POLICIES_COUNT" Value="0">
+              <False>
+                <ExtractVariablesFromTable Table="Heir_Exists_During_Jeopardy_List" SelectQuery="SIGORTALI_KIMLIK_NO={0} AND TRIM(DURUMU)='AÇIK' AND TRIM(ACIK_ADRES)='{1}' AND LETTERS_SENT='X'" ParameterVariables="SIGORTALI_KIMLIK_NO,ACIK_ADRES" SingleOutputTextFormat="{0} {1}" MultipleOutputTextFormat="{0} {1}, " Columns="AD,SOYAD" OutputVariable="BENEFICIARY_FULLNAME"/>
+                <FillPlainTextContentControl Tag="LETTER_COUNTER" Variable="LETTER_COUNTER"/>
+                <CompareVariableWithValue Variable="ACIK_ADRES" Value="">
+                  <True>
+                    <LogEvent Format="{0} TC Kimlik Numaralı {1}'ın açık adresi olmadığı için mektup hazırlanmadı." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME"/>
+                  </True>
+                  <False>
+                    <SetVariable Variable="POLICIES_TEXT" Value=""/>
+                    <SetVariable Variable="POLICIES_TEXT" ConcatenateVariable="POLICIES"/>
+                    <CompareVariableWithValue Variable="POLICIES_COUNT" Value="1">
+                      <True>
+                        <SetVariable Variable="POLICIES_TEXT" ConcatenateText=" numaralı poliçe"/>
+                      </True>
+                      <False>
+                        <SetVariable Variable="POLICIES_TEXT" ConcatenateText=" numaralı poliçeler"/>
+                      </False>
+                    </CompareVariableWithValue>
+                    <StoreQueryResultToVariables SelectQuery="SELECT CONCAT(CONCAT(TRIM(A.MSTADI), ' '), TRIM(A.MSTSOY)) AS DECEASED_NAME FROM CGNLLIB.PFMUSKIS A WHERE A.MUSNO = {0} FETCH FIRST 1 ROWS ONLY" ParameterVariables="SIGORTALI_KIMLIK_NO"/>
+                    <FillPlainTextContentControl Tag="POLICIES" Variable="POLICIES"/>
+                    <FillPlainTextContentControl Tag="BENEFICIARY_FULLNAME" Variable="BENEFICIARY_FULLNAME"/>
+                    <FillPlainTextContentControl Tag="BENEFICIARY_ADDRESS" Variable="ACIK_ADRES"/>
+                    <FillPlainTextContentControl Tag="POLICIES_TEXT" Variable="POLICIES_TEXT"/>
+                    <FillPlainTextContentControl Tag="DECEASED_NAME" Variable="DECEASED_NAME"/>
+                    <SaveDocumentAsNewFile FileName="SBM VEFAT_" Folder="Letters" SuffixVariable="LETTER_COUNTER"/>
+                    <SetVariable Variable="LETTER_COUNTER" Increment="1"/>
+                  </False>
+                </CompareVariableWithValue>
+              </False>
+            </CompareVariableWithValue>
+          </False>
+        </CompareVariableWithValue>
+      </True>
+    </CompareVariableWithValue>
+    <CompareVariableWithValue Variable="DURUMU" Value="ÖLÜM">
+      <True>
+        <LogEvent Format="{0} TC Kimlik Numaralı {1}, {2} tarihinde vefat ettiği için mektup gönderilmeyecek." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME,VEFAT_TARIHI1"/>
+      </True>
+    </CompareVariableWithValue>
+    <CompareVariableWithValue Variable="DURUMU" Value="VATANDAŞLIKTAN ÇIKMA">
+      <True>
+        <LogEvent Format="{0} TC Kimlik Numaralı {1} vatandaşlıktan çıktığı için mektup gönderilmeyecek." Variables="VARIS_KIMLIK_NO,BENEFICIARY_FULLNAME"/>
+      </True>
+    </CompareVariableWithValue>
+  </Section>
+  <Section Name="ProductLogicLoop">
+    <!-- Process_Only_Active_Policies -->
+    <ExtractVariablesFromTable Table="Heir_Exists_During_Jeopardy_List" SelectQuery="SIGORTALI_KIMLIK_NO={0}" ParameterVariables="SIGORTALI_KIMLIK_NO" Columns="VEFAT_TARIHI" SingleOutputTextFormat="{0}" OutputVariable="VEFAT_TARIHI"/>
+    <StoreExcelDateToVariables Variable="VEFAT_TARIHI" DayVariable="DEATH_DAY" MonthVariable="DEATH_MONTH" YearVariable="DEATH_YEAR"/>
+    <CompareVariableWithValue Variable="SEVK_CODE" Value="28000">
+      <True>
+        <LookUpTable Table="Group_Types" PrimaryKeyVariables="GROUP_CODE" RetrieveColumns="GROUP_TYPE,CURRENCY_TYPE" StoreAtVariables="GROUP_TYPE,CURRENCY_TYPE"/>
+        <ExecuteSection Section="CreateCompensationFileSub"/>
+      </True>
+      <False>
+        <CompareVariableWithValue Variable="SEVK_CODE" Value="52000">
+          <True>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi tenzil olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+          </True>
+          <False>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin {1}/{2} numaralı poliçesi iptal olduğu için hasar dosyası açılmadı." Variables="SIGORTALI_KIMLIK_NO,GROUP_CODE,POLICY_CODE"/>
+          </False>
+        </CompareVariableWithValue>
+      </False>
+    </CompareVariableWithValue>
+  </Section>
+  <Section Name="ScrapePoliciesFromConsoleLoop">
+    <!-- Customer_Already_Querried -->
+    <CompareVariableWithTN5250 Variable="SIGORTALI_KIMLIK_NO" Left="18" Top="4" Length="11">
+      <False>
+        <WriteToTN5250 Value="" Submit="true"/>
+        <WriteToTN5250 Variable="SIGORTALI_KIMLIK_NO" Submit="true"/>
+        <!-- Skip_If_Customer_No_Not_Found -->
+        <CompareValueWithTN5250 Value="GÖRÜNTÜLENEBİLECEK BİR BİLGİ BULUNMAMAKTADIR." Left="20" Top="12">
+          <True>
+            <LogEvent Format="{0} TC kimlik numaralı müşterinin sistemde kayıtlı poliçesi bulunamadı." Variables="SIGORTALI_KIMLIK_NO"/>
+          </True>
+          <False>
+            <ScrapeFromTN5250 Left="3" Top="7" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="7" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="7" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="8" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="8" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="8" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="9" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="9" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="9" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="10" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="10" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="10" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="11" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="11" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="11" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="12" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="12" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="12" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="13" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="13" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="13" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="14" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="14" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="14" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="15" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="15" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="15" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+            <ScrapeFromTN5250 Left="3" Top="16" Length="5" Variable="GROUP_CODE"/>
+            <ScrapeFromTN5250 Left="9" Top="16" Length="8" Variable="POLICY_CODE"/>
+            <ScrapeFromTN5250 Left="62" Top="16" Length="5" Variable="SEVK_CODE"/>
+            <MoveVariablesToTable Table="Policies_Of_Customers"/>
+          </False>
+        </CompareValueWithTN5250>
+      </False>
+    </CompareVariableWithTN5250>
+  </Section>
+</Task>
