@@ -307,8 +307,10 @@ namespace RPA.Core
             {
                 if (_excelWorkbook != null)
                 {
+                    _excelWorkbook.Save();
                     _excelWorkbook.Close();
                 }
+                
                 _excelApplication.WindowState = XlWindowState.xlMinimized;
                 _excelApplication.Quit();
 
