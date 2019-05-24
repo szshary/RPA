@@ -52,6 +52,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rule Engine", "Rule Engine\Rule Engine.csproj", "{A01BAEB0-C844-4588-9A53-702C7E47AE86}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Risk_Management_MASAK_Control", "Risk_Management_MASAK_Control", "{65028698-4A70-477D-A16E-9C0AE5EFC8DE}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Desktop\MASAK_Control.xlsx = ..\..\..\..\Desktop\MASAK_Control.xlsx
+		MASAK_Control_Main.xml = MASAK_Control_Main.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +85,7 @@ Global
 		{1EC62F0B-91F3-4C2D-964F-DB3FFA91D24F} = {9AD36E18-FFBB-4586-A556-EB5CC068857C}
 		{8862F28D-D2F7-4A04-B310-4D05F92CC243} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
 		{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65} = {8862F28D-D2F7-4A04-B310-4D05F92CC243}
+		{65028698-4A70-477D-A16E-9C0AE5EFC8DE} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4222838C-204F-42F9-981D-17CB5D00BBC6}
