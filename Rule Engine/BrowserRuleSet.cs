@@ -258,8 +258,15 @@ namespace RPA.Core
                 }
 
                 ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.AddArgument("user-data-dir=C:\\Users\\BIM2456\\AppData\\Local\\Google\\Chrome\\User Data\\Default");
-                _htmlDriver = new ChromeDriver(chromeOptions);
+                //chromeOptions.AddArgument("user-data-dir=C:\\Users\\BIM2456\\AppData\\Local\\Google\\Chrome\\User Data\\Default");
+                _htmlDriver = new ChromeDriver(chromeOptions)
+                {
+                    Url = parameters["URL"]
+                };
+                _wait = new WebDriverWait(_htmlDriver, TimeSpan.FromSeconds(20.00))
+                {
+                    PollingInterval = TimeSpan.FromSeconds(2.0)
+                };
 
                 //htmlDriver = new EdgeDriver();
 
@@ -267,10 +274,6 @@ namespace RPA.Core
                 //htmlDriver = new FirefoxDriver(firefoxProfile);
 
                 //htmlDriver = new InternetExplorerDriver();
-
-                _htmlDriver.Url = parameters["URL"];
-                _wait = new WebDriverWait(_htmlDriver, TimeSpan.FromSeconds(20.00));
-                _wait.PollingInterval = TimeSpan.FromSeconds(2.0);
 
                 _frameNames = new List<string>();
             }

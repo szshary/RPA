@@ -1,0 +1,25 @@
+﻿<Task>
+  <Section Name="Main">
+  <ExcelSession Folder="ExcelDocuments" FileName="MASAK_Control.xlsx">
+    <!-- Get High Risk Customer Info -->
+    <Phase Name="Get_High_Risk_Customer_Info">
+      <StoreExcelRangeToTable SourceWorksheet="liste" RangeStart="A1" RangeEnd= "AG24" Table="MASAK_CONTROL"/>
+      <!-- INSIS PROD Login -->
+    <BrowserSession URL="http://ahefeniksprod.anadoluhayat.com.tr/insis_gen_v10/faces/login.jspx">
+        <Phase Name="Login">
+          <SendTextToBrowser Id="pt1:pt_s2:usrname::content" Value="ROBOTUSER"/>
+          <SendTextToBrowser Id="pt1:pt_s2:pswd::content" Value="a123H4E56!"/>
+          <ClickBrowser Id="pt1:pt_s2:login::icon"/>
+          <ClickBrowser Id="pageTemplate:treeMenu:1:treeMenuLink"/>
+          <ClickBrowser Id="pageTemplate:treeMenu:8:treeMenuLink"/>
+          <ClickBrowser Id="pageTemplate:treeMenu:14:treeMenuLink"/>
+        </Phase>
+    <!-- Process SBT -->
+    <Phase>
+      <!-- <LoopThroughTable FileName="MASAK_Control_Loop.xml" Table="SBT_Transfers"/> -->
+    </Phase>
+  </BrowserSession>
+    </Phase>
+  </ExcelSession>
+    </Section>
+</Task>

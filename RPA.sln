@@ -54,8 +54,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rule Engine", "Rule Engine\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Risk_Management_MASAK_Control", "Risk_Management_MASAK_Control", "{65028698-4A70-477D-A16E-9C0AE5EFC8DE}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\Desktop\MASAK_Control.xlsx = ..\..\..\..\Desktop\MASAK_Control.xlsx
-		MASAK_Control_Main.xml = MASAK_Control_Main.xml
+		Automated Processes\Risk_Management_MASAK_Control\MASAK_Control_Main.xml = Automated Processes\Risk_Management_MASAK_Control\MASAK_Control_Main.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelDocuments", "ExcelDocuments", "{43ED1D09-CB0A-4D73-8A0D-FF6981571EA8}"
+	ProjectSection(SolutionItems) = preProject
+		Automated Processes\Risk_Management_MASAK_Control\ExcelDocuments\MASAK_Control.xlsx = Automated Processes\Risk_Management_MASAK_Control\ExcelDocuments\MASAK_Control.xlsx
 	EndProjectSection
 EndProject
 Global
@@ -86,6 +90,7 @@ Global
 		{8862F28D-D2F7-4A04-B310-4D05F92CC243} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
 		{6E1E9F1B-D1D2-4DAB-B83E-634FA1BF8B65} = {8862F28D-D2F7-4A04-B310-4D05F92CC243}
 		{65028698-4A70-477D-A16E-9C0AE5EFC8DE} = {775FDF50-1115-4F69-BE97-1EB9FE61E5A8}
+		{43ED1D09-CB0A-4D73-8A0D-FF6981571EA8} = {65028698-4A70-477D-A16E-9C0AE5EFC8DE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4222838C-204F-42F9-981D-17CB5D00BBC6}

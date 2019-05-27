@@ -193,31 +193,43 @@ namespace RPA.Core
         {
             if (parameters.ContainsKey("Table") && parameters.ContainsKey("SourceWorksheet") && CheckWorksheetExists(parameters["SourceWorksheet"]))
             {
-                Range excelRange = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].UsedRange;
-
-                using (System.Data.DataTable table = new System.Data.DataTable(parameters["Table"]))
+                Range excelRange = null;
+                if ((parameters.ContainsKey("RangeStart") ^ (parameters.ContainsKey("RangeStartVariable") && EngineState.VariableDictionary.ContainsKey(parameters["RangeStartVariable"])))
+                    && (parameters.ContainsKey("RangeEnd") ^ (parameters.ContainsKey("RangeEndVariable") && EngineState.VariableDictionary.ContainsKey(parameters["RangeEndVariable"]))))
                 {
-                    Object[,] values = (Object[,])excelRange.Value2;
+                    excelRange = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].Range(parameters["RangeStart"] ?? EngineState.VariableDictionary["RangeStartVariable"],
+                        parameters["RangeEnd"] ?? EngineState.VariableDictionary["RangeEndVariable"]);
+                }
+                else
+                {
+                    excelRange = _excelWorkbook.Sheets[parameters["SourceWorksheet"]].UsedRange;
+                }
+                if (excelRange != null)
+                {
+                    using (System.Data.DataTable table = new System.Data.DataTable(parameters["Table"]))
+                    {
+                        Object[,] values = (Object[,])excelRange.Value2;
 
-                    for (int i = 1; i <= values.GetLength(1); i++)
-                    {
-                        table.Columns.Add(values[1, i].ToString());
-                    }
-                    for (int i = 2; i <= values.GetLength(0); ++i)
-                    {
-                        DataRow row = table.NewRow();
-                        for (var j = 1; j <= values.GetLength(1); ++j)
+                        for (int i = 1; i <= values.GetLength(1); i++)
                         {
-                            row[j - 1] = values[i, j];
+                            table.Columns.Add(values[1, i].ToString());
                         }
-                        table.Rows.Add(row);
+                        for (int i = 2; i <= values.GetLength(0); ++i)
+                        {
+                            DataRow row = table.NewRow();
+                            for (var j = 1; j <= values.GetLength(1); ++j)
+                            {
+                                row[j - 1] = values[i, j];
+                            }
+                            table.Rows.Add(row);
+                        }
+                        if (EngineState.TableList.Exists((x) => { return (x.TableName == table.TableName); }))
+                        {
+                            EngineState.TableList.Remove(EngineState.TableList.Find((x) => { return (x.TableName == table.TableName); }));
+                        }
+                        table.TableName = parameters["Table"];
+                        EngineState.TableList.Add(table);
                     }
-                    if (EngineState.TableList.Exists((x) => { return (x.TableName == table.TableName); }))
-                    {
-                        EngineState.TableList.Remove(EngineState.TableList.Find((x) => { return (x.TableName == table.TableName); }));
-                    }
-                    table.TableName = parameters["Table"];
-                    EngineState.TableList.Add(table);
                 }
             }
         }
